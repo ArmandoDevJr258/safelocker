@@ -1,22 +1,48 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View,TouchableOpacity,Image} from 'react-native';
 import React, { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
 export default function App() {
+   const [isDark, setIsDark] = useState(false);
   
+  useEffect(() => {
+    const loadTheme = async () => {
+      try {
+        const saved = await AsyncStorage.getItem('theme');
+        if (saved !== null) {
+          setIsDark(saved === 'dark');
+        }
+      } catch (err) {
+        console.log('Error loading theme:', err);
+      }
+    };
+    loadTheme();
+  }, []);
 
+  // Toggle theme and save it
+  const toggleTheme = async () => {
+    try {
+      const newValue = !isDark;
+      setIsDark(newValue);
+      await AsyncStorage.setItem('theme', newValue ? 'dark' : 'light');
+    } catch (err) {
+      console.log('Error saving theme:', err);
+    }
+  };
    
   
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isDark ? styles.dark : styles.light]}>
       <View style={styles.header}>
         <Text style={styles.appName}>safelocker</Text>
 
-         <TouchableOpacity style={styles.btnmode}>
+         <TouchableOpacity style={styles.btnmode} onPress={toggleTheme}
+          activeOpacity={0.7}>
           <Image
-          source={require('./assets/night-mode.png')}
+           source={isDark ? require('./assets/brightness.png') : require('./assets/night-mode.png')}
           style={{width:20,height:20}}/>
         </TouchableOpacity>
         <TouchableOpacity style={styles.btnflag}>
@@ -49,7 +75,7 @@ export default function App() {
        </View>
        <View style={styles.bottomview}>
          <TouchableOpacity>
-          <View style={styles.view}>
+          <View style={styles.view2}>
             
 
           </View>
@@ -58,7 +84,7 @@ export default function App() {
           <View style={styles.addview}>
             <Image
          source={require('./assets/add-button.png')}
-         style={{width:150,height:150}}/>
+         style={{width:100,height:100,marginTop:20}}/>
 
           </View>
         </TouchableOpacity>
@@ -74,6 +100,7 @@ export default function App() {
           marginTop:5
         }}>Added files recently</Text>
 
+
       </View>
     </View>
   );
@@ -85,6 +112,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+   dark: {
+    backgroundColor: '#222',
+  },
+  light: {
+    backgroundColor: '#fff',
   },
   header:{
     position:'absolute',
@@ -140,8 +173,17 @@ const styles = StyleSheet.create({
     borderRadius:10
 
   },
+   view2:{
+    width:200,
+    height:150,
+    backgroundColor:'darkgray',
+    margin:10,
+    marginTop:50,
+    borderRadius:10
+
+  },
    addview:{
-    width:150,
+    width:100,
     height:150,
     margin:10,
     marginTop:50,
