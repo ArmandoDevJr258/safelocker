@@ -1,11 +1,80 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View,TouchableOpacity,Image} from 'react-native';
+import React, { useState, useEffect } from 'react';
+
+
 
 export default function App() {
+  
+
+   
+  
   return (
     <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <View style={styles.header}>
+        <Text style={styles.appName}>safelocker</Text>
+
+         <TouchableOpacity style={styles.btnmode}>
+          <Image
+          source={require('./assets/night-mode.png')}
+          style={{width:20,height:20}}/>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btnflag}>
+          <Image
+          source={require('./assets/united-states.png')}
+          style={{width:20,height:20}}/>
+        </TouchableOpacity>
+         
+         <TouchableOpacity style={styles.btnsettings}>
+          <Image
+          source={require('./assets/settings.png')}
+          style={{width:20,height:20}}/>
+        </TouchableOpacity>
+
+      </View>
+
+      <View style={styles.maincontainer}>
+       <View style={styles.topview}>
+       <TouchableOpacity>
+          <View style={styles.view}>
+            <Text style={styles.text1}>My passwords</Text>
+
+          </View>
+        </TouchableOpacity>
+         <TouchableOpacity>
+          <View style={styles.view}>
+           <Text style={styles.text1}>My Files</Text>
+          </View>
+        </TouchableOpacity>
+       </View>
+       <View style={styles.bottomview}>
+         <TouchableOpacity>
+          <View style={styles.view}>
+            
+
+          </View>
+        </TouchableOpacity>
+         <TouchableOpacity>
+          <View style={styles.addview}>
+            <Image
+         source={require('./assets/add-button.png')}
+         style={{width:150,height:150}}/>
+
+          </View>
+        </TouchableOpacity>
+       </View>
+        
+        
+
+      </View>
+      <View style={styles.footerView}>
+        <Text style={{fontSize:20,
+        fontWeight:'bold',
+        marginLeft:30,
+          marginTop:5
+        }}>Added files recently</Text>
+
+      </View>
     </View>
   );
 }
@@ -17,4 +86,85 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  header:{
+    position:'absolute',
+    top:20,
+    width:'100%',
+    height:50,
+    flexDirection:'row',
+    gap:20
+    
+
+  },
+  appName:{
+    fontSize:30,
+    fontWeight:'bold',
+    color:'orange',
+    marginLeft:20
+
+  },
+  btnmode:{
+    marginLeft:50,
+    marginTop:12
+  },
+  btnflag:{
+    marginLeft:10,
+    marginTop:12
+  },
+  btnsettings:{
+    marginLeft:10,
+    marginTop:12
+  },
+  maincontainer:{
+    width:'90%',
+    height:450,
+    backgroundColor:'gray',
+    marginTop:-150,
+    borderRadius:20,
+   
+   
+  },
+  topview:{
+    flexDirection:'row',
+    width:'100%'
+  },
+  bottomview:{
+   flexDirection:'row'
+  },
+  view:{
+    width:150,
+    height:150,
+    backgroundColor:'darkgray',
+    margin:10,
+    marginTop:50,
+    borderRadius:10
+
+  },
+   addview:{
+    width:150,
+    height:150,
+    margin:10,
+    marginTop:50,
+    borderRadius:10
+
+  },
+  footerView:{
+    position:'absolute',
+    bottom:0,
+    width:'100%',
+    height:250,
+    backgroundColor:'lightgreen',
+    borderTopLeftRadius:20,
+    borderTopRightRadius:20
+   
+  
+  },
+  text1:{
+    fontSize:20,
+    fontWeight:'bold',
+    color:'white',
+    marginTop:50,
+    textAlign:'center'
+  }
+  
 });
