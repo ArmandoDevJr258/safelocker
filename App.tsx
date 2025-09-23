@@ -27,6 +27,9 @@ export default function App() {
   const [renameModalVisible, setRenameModalVisible] = useState(false);
   const [flatListKey, setFlatListKey] = useState(0);
   const [isGridView, setIsGridView] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+const [fileModalVisible, setFileModalVisible] = useState(false);
+
 
   // PIN states
   const [pinModalVisible, setPinModalVisible] = useState(true);
@@ -39,6 +42,7 @@ export default function App() {
   // fake screens
   const [myFiles, setmyFiles] = useState(false);
   const [myPasswords, setmyPasswords] = useState(false);
+  const [setttingsView,setsettingsView]= useState(false);
 
   // Load saved folders from AsyncStorage on mount
   useEffect(() => {
@@ -174,10 +178,18 @@ const showAlert = (file) => {
 
   // Render each file in FlatList
 const renderFile = ({ item }) => (
-  <TouchableOpacity style={styles.fileItem} onPress={() => showAlert(item)}>
+  <TouchableOpacity
+    style={styles.fileItem}
+    onPress={() => {
+      setSelectedFile(item);
+      setFileModalVisible(true);
+    }}
+    onLongPress={() => showAlert(item)}
+  >
     <Text style={styles.fileText}>{item.name}</Text>
   </TouchableOpacity>
 );
+
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -298,40 +310,45 @@ const renderFile = ({ item }) => (
       greeting: 'Hello',
       darkMode: 'Dark Mode',
       chooseLanguage: 'Choose Language',
-      Addedfiles: 'Files recently added',
+      recentactivity: 'Recent activity',
       Myfiles: 'My files',
       Mypasswords: 'My passwords',
       Mytrashbean: 'My trash bean',
       enterPin: settingPin ? 'Set your PIN' : 'Enter PIN',
       Cancel: 'Cancel',
       Rename: 'Rename',
-      Save: 'Save'
+      Save: 'Save',
+      untitledfolder:'Untitled folder',
+      EmptyFolder:'empty folder'
     },
     fr: {
       greeting: 'Bonjour',
       darkMode: 'Mode sombre',
       chooseLanguage: 'Choisir la langue',
-      Addedfiles: 'Fichiers ajoutés',
+      recentactivity: 'Recent activity',
       Myfiles: 'Mes fichiers',
-      Mypasswords: 'Mes mots de passe',
+      Mypasswords: ' mots de passe',
       Mytrashbean: 'Poubelle',
       enterPin: settingPin ? 'Définir votre PIN' : 'Entrez le PIN',
       Cancel: 'Annuler',
       Rename: 'Renommer',
-      Save: 'Enregistrer'
+      Save: 'Enregistrer',
+       EmptyFolder:'No files added yet'
     },
     pt: {
       greeting: 'Olá',
       darkMode: 'Modo escuro',
       chooseLanguage: 'Escolher idioma',
-      Addedfiles: 'Arquivos adicionados recentemente',
+      recentactivity: 'Actividade recente',
       Myfiles: 'Meus arquivos',
       Mypasswords: 'Minhas senhas',
       Mytrashbean: 'Pasta de lixo',
       enterPin: settingPin ? 'Defina seu PIN' : 'Digite o PIN',
       Cancel: 'Cancelar',
       Rename: 'Renomear',
-      Save: 'Salvar'
+      Save: 'Salvar',
+      untitledfolder:'pasta sem nome',
+       EmptyFolder:'pasta vazia'
     },
   };
 
@@ -389,15 +406,24 @@ const renderFile = ({ item }) => (
 
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.appName}>safelocker</Text>
+        <View style={{
+          flexDirection:'row'
+        }}>
+          <Image
+          source={require('./assets/lock.png')} // your local icon path
+          style={styles.icon}
+        />
+       <Text style={styles.appName}>safelocker</Text>
+        </View>
+        
         <TouchableOpacity style={styles.btnmode} onPress={toggleTheme}>
           <Image source={isDark ? require('./assets/brightness.png') : require('./assets/night-mode.png')} style={{ width: 20, height: 20 }} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.btnflag} onPress={() => setLangModalVisible(true)}>
           <Image source={getFlagSource()} style={{ width: 20, height: 20 }} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.btnsettings}>
-          <Image source={require('./assets/settings.png')} style={{ width: 20, height: 20 }} />
+        <TouchableOpacity style={styles.btnsettings} onPress={()=>setsettingsView(true)}>
+          <Image source={require('./assets/settings.png')} style={{ width: 20, height: 20 ,tintColor:'white'}} />
         </TouchableOpacity>
       </View>
 
@@ -405,28 +431,91 @@ const renderFile = ({ item }) => (
       <View style={styles.maincontainer}>
         <View style={styles.topview}>
           <TouchableOpacity onPress={() => setmyPasswords(true)}>
-            <View style={styles.view}>
-              <Text style={styles.text1}>{t('Mypasswords')}</Text>
+            <View style={{
+              width: 160, 
+              height: 160,
+               backgroundColor: '#6A4A99',
+                margin: 10, 
+                marginTop: 50,
+                 borderRadius: 20 
+            }}>
+              <Image
+              source={require('./assets/key.png')}
+              style={{width:80,height:80,marginTop:30,marginLeft:40,tintColor:'white'}}
+              />
+              <Text style={{
+                position:'absolute',
+                top:115,
+                left:10,
+                fontSize:20,
+                fontWeight:'bold'
+                ,color:'black'
+              }}>{t('Mypasswords')}</Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setmyFiles(true)}>
-            <View style={styles.view}>
-              <Text style={styles.text1}>{t('Myfiles')}</Text>
+            <View style={{
+              width: 160, 
+              height: 160,
+               backgroundColor: '#5CB85C',
+                margin: 10, 
+                marginTop: 50,
+                 borderRadius: 20 
+            }}>
+               <Image
+              source={require('./assets/file.png')}
+              style={{width:70,height:70,marginTop:30,marginLeft:40,tintColor:'white'}}
+              />
+              <Text style={{
+                position:'absolute',
+                top:115,
+                left:20,
+                fontSize:20,
+                fontWeight:'bold',color:'black'
+              }}>{t('Myfiles')}</Text>
             </View>
           </TouchableOpacity>
         </View>
         <View style={styles.bottomview}>
           <TouchableOpacity>
             <View style={styles.view2}>
-              <Text style={styles.text1}>{t('Mytrashbean')}</Text>
+              <Image
+              source={require('./assets/recycle-bin.png')}
+              style={{width:80,height:80,marginTop:50,marginLeft:55,tintColor:'white'}}
+              />
+              <Text style={{
+                position:'absolute',
+                top:20,
+                left:40,
+                fontSize:20,
+                fontWeight:'bold'
+              }}>{t('Mytrashbean')}</Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity>
             <View style={styles.addview}>
-              <Image source={require('./assets/add-button.png')} style={{ width: 100, height: 100, marginTop: 20 }} />
+              <Image source={require('./assets/plus3.png')} 
+              style={{ width: 100, height: 100, marginTop: 20 }} />
             </View>
           </TouchableOpacity>
         </View>
+      </View>
+
+      <View style={{
+        width:'100%',
+        height:300,
+        backgroundColor:'#9fa49fff',
+        borderTopLeftRadius:40,
+        borderTopRightRadius:40,
+        marginTop:30,
+       
+      }}>
+        <Text style={{
+          fontSize:30,
+          fontWeight:'bold',
+          marginLeft:20,
+          marginTop:10
+        }}>{t('recentactivity')}</Text>
       </View>
 
       {/* Language Modal */}
@@ -550,7 +639,8 @@ const renderFile = ({ item }) => (
               data={selectedFolder?.files || []}
               keyExtractor={(item) => item.id}
               renderItem={renderFile}
-              ListEmptyComponent={<Text>No files added yet</Text>}
+              ListEmptyComponent={<Text style={{fontStyle:'italic'}}>{t('EmptyFolder')}</Text>}
+              style={{marginLeft:10}}
             />
             <TouchableOpacity style={styles.btnadd} onPress={pickFile}>
               <Image 
@@ -562,30 +652,129 @@ const renderFile = ({ item }) => (
           </View>
         </View>
       </Modal>
+
+      {setttingsView&&(
+        <Modal
+        onRequestClose={()=>setsettingsView(false)}>
+          <View>
+            <View style={{
+              
+            }}>
+   <Text style={{
+              marginLeft:20,
+              fontSize:25,
+              fontWeight:'bold',
+              marginTop:20
+
+            }}>Settings</Text>
+
+            </View>
+         
+            <View style={{
+              marginTop:200,
+              marginLeft:20
+            }}>
+                <Text style={{
+            fontSize:20,
+            fontWeight:'bold',
+            marginLeft:40,
+            padding:10
+           }}>Apearence</Text>
+           <Text style={{
+            fontSize:20,
+            fontWeight:'bold',
+            marginLeft:40,
+            padding:10
+           }}>File managment</Text>
+            <Text style={{
+            fontSize:20,
+            fontWeight:'bold',
+            marginLeft:40,
+             padding:10
+           }}>security & privacy</Text>
+            <Text style={{
+            fontSize:20,
+            fontWeight:'bold',
+            marginLeft:40,
+             padding:10
+           }}>About app</Text>
+          <Text style={{
+            fontSize:20,
+            fontWeight:'bold',
+            marginLeft:40,
+             padding:10
+           }}>Contact developer team</Text>
+          
+            </View>
+       
+          </View>
+
+        </Modal>
+      )}
+      {/* Modal that shows a single file */}
+<Modal
+  visible={fileModalVisible}
+  animationType="slide"
+  onRequestClose={() => setFileModalVisible(false)}
+>
+  {/* full-screen container */}
+  <View style={{ flex: 1, backgroundColor: 'black' }}>
+    {selectedFile?.uri &&
+    selectedFile.name.match(/\.(jpg|jpeg|png|gif)$/i) ? (
+      <RNImage
+        source={{ uri: selectedFile.uri }}
+        style={{ flex: 1, width: '100%', height: '100%',alignSelf:'center' }}
+        resizeMode="contain" // cover = fill entire screen, maintain aspect ratio
+      />
+    ) : (
+      <Text style={{ color: 'white', margin: 20 }}>
+        File URI: {selectedFile?.uri}
+      </Text>
+    )}
+
+    {/* Close button floating over the image */}
+    <TouchableOpacity
+      onPress={() => setFileModalVisible(false)}
+      style={{
+        position: 'absolute',
+        top: 40, // adjust for status bar
+        right: 20,
+        backgroundColor: 'white',
+        paddingHorizontal: 15,
+        paddingVertical: 8,
+        borderRadius: 10,
+      }}
+    >
+      <Text style={{ color: 'black', fontSize: 16 }}>Close</Text>
+    </TouchableOpacity>
+  </View>
+</Modal>
+
+
     </View>
   );
 }
 
 const styles = StyleSheet.create({
     container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    dark: { backgroundColor: '#222' },
+    dark: { backgroundColor: '#1A1A2E' },
     light: { backgroundColor: '#fff' },
-    header: { position: 'absolute', top: 20, width: '100%', height: 50, flexDirection: 'row', gap: 20 },
-    appName: { fontSize: 30, fontWeight: 'bold', color: 'orange', marginLeft: 20 },
-    btnmode: { marginLeft: 50, marginTop: 12 },
+    header: { position: 'absolute', top: 20, width: '100%', height: 45, flexDirection: 'row', gap: 20 },
+    appName: { fontSize: 30, fontWeight: 'bold', color: 'orange', },
+    btnmode: { marginLeft: 20, marginTop: 12 },
     btnflag: { marginLeft: 10, marginTop: 12 },
-    btnsettings: { marginLeft: 10, marginTop: 12 },
-    maincontainer: { width: '90%', height: 450, backgroundColor: 'gray', marginTop: -150, borderRadius: 20 },
+    btnsettings: { marginLeft: 10, marginTop: 12,tintColor:'white' },
+    maincontainer: { width: '100%', height: 450, marginTop: 40, borderRadius: 20 ,marginLeft:20},
     topview: { flexDirection: 'row', width: '100%' },
     bottomview: { flexDirection: 'row' },
-    view: { width: 150, height: 150, backgroundColor: 'darkgray', margin: 10, marginTop: 50, borderRadius: 10 },
-    view2: { width: 200, height: 150, backgroundColor: 'darkgray', margin: 10, marginTop: 50, borderRadius: 10 },
+    view: { width: 150, height: 150, backgroundColor: '#6A4A99', margin: 10, marginTop: 50, borderRadius: 20 },
+    view2: { width: 200, height: 160, backgroundColor: '#F2994A', margin: 10, marginTop: 50, borderRadius: 20 },
     addview: { width: 100, height: 150, margin: 10, marginTop: 50, borderRadius: 10 },
     footerView: { position: 'absolute', bottom: 0, width: '100%', height: 250, backgroundColor: 'lightgreen', borderTopLeftRadius: 20, borderTopRightRadius: 20 },
-    text1: { fontSize: 20, fontWeight: 'bold', color: 'white', marginTop: 50, textAlign: 'center' },
+
     modalBackground: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
     modalContainer: { width: '80%', backgroundColor: 'white', padding: 20, borderRadius: 10, alignItems: 'center' },
-    modalTitleText: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+    modalTitleText: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 ,marginLeft:20,marginTop:20},
     input: { width: '60%', height: 50, borderWidth: 1, borderColor: '#ccc', borderRadius: 10, textAlign: 'center', fontSize: 25, marginBottom: 20, color: 'green' },
     button: { backgroundColor: '#007bff', paddingVertical: 10, paddingHorizontal: 30, borderRadius: 10 },
     buttonText: { color: 'white', fontSize: 18 },
@@ -728,5 +917,17 @@ const styles = StyleSheet.create({
         bottom: 30,
         right: 30
     },
+      icon: {
+    width: 30,
+    height: 25,
+    marginHorizontal: 2, 
+    marginTop:8,
+    marginLeft:20,
+    tintColor:'white'
+  },
+  filemodalContainer:{
+    width:'100%',
+    height:400
+  }
     
 });
