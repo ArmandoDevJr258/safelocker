@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as DocumentPicker from 'expo-document-picker';
+import { Image as RNImage } from 'react-native';
 
 export default function App() {
   const [isDark, setIsDark] = useState(false);
@@ -23,30 +24,9 @@ export default function App() {
   const [folderedit, setfolderedit] = useState(false);
   const [header, setheader] = useState(true);
   const [newFolderName, setNewFolderName] = useState('');
-  const [renameModalVisible, setRenameModalVisible] = useState(false); // New state for the rename modal
-
-  // delete folder
-  const deleteFolder = (id) => {
-    setFolders(prev => prev.filter(folder => folder.id !== id));
-  };
-
-  const handleDelete = async () => {
-    if (!selectedFolder) return;
-    const updatedFolders = folders.filter(f => f.id !== selectedFolder.id);
-    setFolders(updatedFolders);
-    setSelectedFolder(null);
-    setfolderedit(false);
-    setheader(true);
-
-    // persist
-    await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
-  };
-
-  useEffect(() => {
-    if (selectedFolder) {
-      setNewFolderName(selectedFolder.name);
-    }
-  }, [selectedFolder]);
+  const [renameModalVisible, setRenameModalVisible] = useState(false);
+  const [flatListKey, setFlatListKey] = useState(0);
+  const [isGridView, setIsGridView] = useState(false);
 
   // PIN states
   const [pinModalVisible, setPinModalVisible] = useState(true);
@@ -59,14 +39,28 @@ export default function App() {
   // fake screens
   const [myFiles, setmyFiles] = useState(false);
   const [myPasswords, setmyPasswords] = useState(false);
-  const [myTrashbean, setmyTrashbean] = useState(false);
 
   // Load saved folders from AsyncStorage on mount
   useEffect(() => {
     const loadFolders = async () => {
       try {
         const savedFolders = await AsyncStorage.getItem('folders');
-        if (savedFolders) setFolders(JSON.parse(savedFolders));
+        if (savedFolders) {
+          const loadedFolders = JSON.parse(savedFolders);
+          const defaultFolderExists = loadedFolders.some(f => f.id === 'default_folder');
+          if (!defaultFolderExists) {
+            const defaultFolder = { id: 'default_folder', name: 'Default Folder', files: [] };
+            const updatedFolders = [defaultFolder, ...loadedFolders];
+            setFolders(updatedFolders);
+            await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
+          } else {
+            setFolders(loadedFolders);
+          }
+        } else {
+          const defaultFolder = { id: 'default_folder', name: 'Default Folder', files: [] };
+          setFolders([defaultFolder]);
+          await AsyncStorage.setItem('folders', JSON.stringify([defaultFolder]));
+        }
       } catch (err) {
         console.log(err);
       }
@@ -74,29 +68,74 @@ export default function App() {
     loadFolders();
   }, []);
 
-  // Pick a file from device
-  const pickFile = async () => {
+  useEffect(() => {
+    if (selectedFolder) {
+      setNewFolderName(selectedFolder.name);
+    }
+  }, [selectedFolder]);
+
+  const toggleGridView = () => {
+    setIsGridView(!isGridView);
+    setFlatListKey(prevKey => prevKey + 1);
+  };
+
+  const deleteFolder = (id) => {
+    setFolders(prev => prev.filter(folder => folder.id !== id));
+  };
+
+  const handleDelete = async () => {
     if (!selectedFolder) return;
+    if (selectedFolder.id === 'default_folder') {
+      Alert.alert('Cannot Delete', 'This is a permanent folder.');
+      setSelectedFolder(null);
+      setfolderedit(false);
+      setheader(true);
+      return;
+    }
+
+    const updatedFolders = folders.filter(f => f.id !== selectedFolder.id);
+    setFolders(updatedFolders);
+    setSelectedFolder(null);
+    setfolderedit(false);
+    setheader(true);
+    await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
+  };
+
+  // Pick a file from device – fixed
+  const pickFile = async () => {
+    if (!selectedFolder) {
+      Alert.alert('No Folder Selected', 'Please select a folder to add a file to.');
+      return;
+    }
     try {
       const result = await DocumentPicker.getDocumentAsync({ copyToCacheDirectory: true });
-      if (result.type === 'success') {
-        const newFile = { id: Date.now().toString(), name: result.name, uri: result.uri };
-
-        const updatedFolders = folders.map(folder => {
-          if (folder.id === selectedFolder.id) {
-            return { ...folder, files: [...folder.files, newFile] };
-          }
-          return folder;
-        });
-
-        setFolders(updatedFolders);
-
-        // Update selectedFolder from the updated array
-        const updatedSelected = updatedFolders.find(f => f.id === selectedFolder.id);
-        setSelectedFolder(updatedSelected);
-
-        await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
+      if (result.canceled) {
+        console.log('Document picking cancelled.');
+        return;
       }
+
+      // new API: get the asset
+      const asset = result.assets[0];
+      const newFile = {
+        id: Date.now().toString(),
+        name: asset.name,
+        uri: asset.uri
+      };
+
+      const updatedFolders = folders.map(folder => {
+        if (folder.id === selectedFolder.id) {
+          const currentFiles = Array.isArray(folder.files) ? folder.files : [];
+          return { ...folder, files: [...currentFiles, newFile] };
+        }
+        return folder;
+      });
+
+      setFolders(updatedFolders);
+      // refresh selectedFolder for modal
+      const updatedFolder = updatedFolders.find(f => f.id === selectedFolder.id);
+      setSelectedFolder(updatedFolder);
+
+      await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
     } catch (err) {
       console.log(err);
     }
@@ -104,10 +143,7 @@ export default function App() {
 
   // Render each file in FlatList
   const renderFile = ({ item }) => (
-    <TouchableOpacity
-      style={styles.fileItem}
-      onPress={() => Alert.alert('File selected', item.name)}
-    >
+    <TouchableOpacity style={styles.fileItem} onPress={() => Alert.alert('File selected', item.name)}>
       <Text style={styles.fileText}>{item.name}</Text>
     </TouchableOpacity>
   );
@@ -144,31 +180,6 @@ export default function App() {
       console.log('Error saving folder:', err);
     }
   };
-
-  useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        const savedPin = await AsyncStorage.getItem('userPin');
-        if (savedPin) {
-          setStoredPin(savedPin);
-          setSettingPin(false);
-          setPinModalVisible(true);
-        } else {
-          setSettingPin(true);
-          setPinModalVisible(true);
-        }
-
-        const savedLang = await AsyncStorage.getItem('language');
-        if (savedLang) setLanguage(savedLang);
-
-        const savedTheme = await AsyncStorage.getItem('theme');
-        if (savedTheme) setIsDark(savedTheme === 'dark');
-      } catch (err) {
-        console.log('Error loading settings:', err);
-      }
-    };
-    loadSettings();
-  }, []);
 
   const toggleTheme = async () => {
     try {
@@ -226,10 +237,13 @@ export default function App() {
     }
   };
 
-  // New rename functions
   const handleRenameSave = async () => {
     if (!selectedFolder || newFolderName.trim() === '') {
       Alert.alert('Invalid Name', 'Folder name cannot be empty.');
+      return;
+    }
+    if (selectedFolder.id === 'default_folder') {
+      Alert.alert('Cannot Rename', 'This is a permanent folder.');
       return;
     }
     const updatedFolders = folders.map(f =>
@@ -259,8 +273,8 @@ export default function App() {
       Mytrashbean: 'My trash bean',
       enterPin: settingPin ? 'Set your PIN' : 'Enter PIN',
       Cancel: 'Cancel',
-      Rename: 'Rename', // Added Rename text
-      Save: 'Save' // Added Save text
+      Rename: 'Rename',
+      Save: 'Save'
     },
     fr: {
       greeting: 'Bonjour',
@@ -406,8 +420,7 @@ export default function App() {
       </Modal>
 
       {myFiles && (
-        <Modal
-          onRequestClose={() => setmyFiles(false)}>
+        <Modal onRequestClose={() => setmyFiles(false)}>
           <View style={styles.FilesView}>
             {header && (<View style={styles.filesheader}>
               <Text style={{ marginLeft: 20, fontSize: 20, fontWeight: 'bold', color: 'white' }}>{t('Myfiles')}</Text>
@@ -423,7 +436,7 @@ export default function App() {
                   style={{ width: 25, height: 25 }}
                 />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.btngrid}>
+              <TouchableOpacity style={styles.btngrid} onPress={toggleGridView}>
                 <Image
                   source={require('./assets/visualization.png')}
                   style={{ width: 20, height: 20 }}
@@ -435,33 +448,40 @@ export default function App() {
                 <Text
                   numberOfLines={1}
                   ellipsizeMode="tail"
-                  style={{ marginLeft: 20, color: 'white', fontSize: 15, fontWeight: 'bold', marginTop: 20, flex: 1 }}
+                  style={{ marginLeft: 20, color: 'white', fontSize: 15, fontWeight: 'bold', flex: 1 }}
                 >
                   {selectedFolder?.name}
                 </Text>
-                <TouchableOpacity
-                  style={styles.renameButton}
-                  onPress={() => {
-                    setRenameModalVisible(true);
-                  }}
-                >
-                  <Text style={{ fontSize: 20 }}>{t('Rename')}</Text>
-                </TouchableOpacity>
+                {selectedFolder?.id !== 'default_folder' && (
+                  <TouchableOpacity
+                    style={styles.renameButton}
+                    onPress={() => {
+                      setRenameModalVisible(true);
+                    }}
+                  >
+                    <Text style={{ fontSize: 20 }}>{t('Rename')}</Text>
+                  </TouchableOpacity>
+                )}
 
                 {/* Delete Button */}
-                <TouchableOpacity style={{ marginTop: 17, marginLeft: 20 }} onPress={handleDelete}>
-                  <Image
-                    source={require('./assets/delete.png')}
-                    style={{ width: 20, height: 20 }}
-                  />
-                </TouchableOpacity>
+                {selectedFolder?.id !== 'default_folder' && (
+                  <TouchableOpacity style={{ marginTop: 17, marginLeft: 20 }} onPress={handleDelete}>
+                    <Image
+                      source={require('./assets/delete.png')}
+                      style={{ width: 20, height: 20 }}
+                    />
+                  </TouchableOpacity>
+                )}
               </View>
             )}
 
-            <View >
+            <View>
               <FlatList
+                key={flatListKey}
                 data={folders}
                 keyExtractor={(item) => item.id}
+                numColumns={isGridView ? 2 : 1}
+                columnWrapperStyle={isGridView ? styles.row : null}
                 renderItem={({ item }) => (
                   <TouchableOpacity
                     onPress={() => {
@@ -469,20 +489,18 @@ export default function App() {
                       setFolderModalVisible(true);
                     }}
                     onLongPress={() => {
-                      setSelectedFolder(item); // set the folder to delete
-                      setheader(false);
-                      setfolderedit(true);
+                      if (item.id === 'default_folder') {
+                        Alert.alert('Cannot Modify', 'This is a permanent folder.');
+                      } else {
+                        setSelectedFolder(item);
+                        setheader(false);
+                        setfolderedit(true);
+                      }
                     }}
+                    style={isGridView ? styles.folderGridItem : styles.folderItem}
                   >
-                    <View style={{
-                      padding: 10,
-                      marginTop: 10,  // <- current value
-                      backgroundColor: 'lightgray',
-                      borderRadius: 8,
-                      width: '50%',
-                      marginLeft: 20
-                    }}>
-                      <Text>{item.name}</Text>
+                    <View>
+                      <Text style={{ textAlign: 'center' }}>{item.name}</Text>
                     </View>
                   </TouchableOpacity>
                 )}
@@ -492,169 +510,192 @@ export default function App() {
         </Modal>
       )}
 
-      {/* The Folder Modal */}
-      <Modal visible={folderModalVisible}
-        animationType="slide"
-        onRequestClose={() => setFolderModalVisible(false)}>
-        <View style={styles.foldermodalContainer}>
-          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{selectedFolder?.name}</Text>
-          <Text style={{ marginTop: 10 }}>This is a fake folder screen.</Text>
-
-          <FlatList
-            data={selectedFolder?.files || []}
-            keyExtractor={(item) => item.id}
-            renderItem={renderFile}
-            contentContainerStyle={{ paddingTop: 20, margin: 30 }}
-          />
-
-          {/* ... (Your other code for the add file button) */}
+      {/* The modal that shows files in a folder */}
+      <Modal visible={folderModalVisible} animationType="slide" onRequestClose={() => setFolderModalVisible(false)}>
+        <View style={styles.modalBackground}>
+          <View style={styles.foldermodalContainer}>
+            <Text style={styles.modalTitleText}>{selectedFolder?.name}</Text>
+            <FlatList
+              data={selectedFolder?.files || []}
+              keyExtractor={(item) => item.id}
+              renderItem={renderFile}
+              ListEmptyComponent={<Text>No files added yet</Text>}
+            />
+            <TouchableOpacity style={styles.btnadd} onPress={pickFile}>
+              <Image 
+              source={require('./assets/add.png')}
+              style={{width:50,height:50}}
+              />
+            </TouchableOpacity>
+            
+          </View>
         </View>
       </Modal>
-
-      {myPasswords && (
-        <Modal
-          onRequestClose={() => setmyPasswords(false)}>
-          <View style={styles.passwordView}>
-            <Text style={{ fontSize: 20, fontWeight: 'bold', marginLeft: 20, color: 'white' }}>{t('Mypasswords')}</Text>
-          </View>
-        </Modal>
-      )}
-
-      {/* Footer */}
-      <View style={styles.footerView}>
-        <Text style={{ fontSize: 20, fontWeight: 'bold', marginLeft: 30, marginTop: 5 }}>
-          {t('Addedfiles')}
-        </Text>
-      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  dark: { backgroundColor: '#222' },
-  light: { backgroundColor: '#fff' },
-  header: { position: 'absolute', top: 20, width: '100%', height: 50, flexDirection: 'row', gap: 20 },
-  appName: { fontSize: 30, fontWeight: 'bold', color: 'orange', marginLeft: 20 },
-  btnmode: { marginLeft: 50, marginTop: 12 },
-  btnflag: { marginLeft: 10, marginTop: 12 },
-  btnsettings: { marginLeft: 10, marginTop: 12 },
-  maincontainer: { width: '90%', height: 450, backgroundColor: 'gray', marginTop: -150, borderRadius: 20 },
-  topview: { flexDirection: 'row', width: '100%' },
-  bottomview: { flexDirection: 'row' },
-  view: { width: 150, height: 150, backgroundColor: 'darkgray', margin: 10, marginTop: 50, borderRadius: 10 },
-  view2: { width: 200, height: 150, backgroundColor: 'darkgray', margin: 10, marginTop: 50, borderRadius: 10 },
-  addview: { width: 100, height: 150, margin: 10, marginTop: 50, borderRadius: 10 },
-  footerView: { position: 'absolute', bottom: 0, width: '100%', height: 250, backgroundColor: 'lightgreen', borderTopLeftRadius: 20, borderTopRightRadius: 20 },
-  text1: { fontSize: 20, fontWeight: 'bold', color: 'white', marginTop: 50, textAlign: 'center' },
-  modalBackground: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
-  modalContainer: { width: '80%', backgroundColor: 'white', padding: 20, borderRadius: 10, alignItems: 'center' },
-  modalTitleText: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-  input: { width: '60%', height: 50, borderWidth: 1, borderColor: '#ccc', borderRadius: 10, textAlign: 'center', fontSize: 25, marginBottom: 20, color: 'green' },
-  button: { backgroundColor: '#007bff', paddingVertical: 10, paddingHorizontal: 30, borderRadius: 10 },
-  buttonText: { color: 'white', fontSize: 18 },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
-  modalContent: { width: '80%', backgroundColor: '#fff', borderRadius: 12, padding: 16 },
-  option: { paddingVertical: 10, paddingHorizontal: 8 },
-  optionText: { fontSize: 16 },
-  closeBtn: { marginTop: 10, alignSelf: 'flex-end' },
-  closeText: { color: 'red' },
-  //fake screen View
-  FilesView: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'gray'
-  },
-  filesheader: {
-    width: '100%',
-    height: 40,
-    flexDirection: 'row',
-    marginTop: 20
-  },
-  btnnewfolder: {
-    position: 'absolute',
-    left: 200,
+    container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    dark: { backgroundColor: '#222' },
+    light: { backgroundColor: '#fff' },
+    header: { position: 'absolute', top: 20, width: '100%', height: 50, flexDirection: 'row', gap: 20 },
+    appName: { fontSize: 30, fontWeight: 'bold', color: 'orange', marginLeft: 20 },
+    btnmode: { marginLeft: 50, marginTop: 12 },
+    btnflag: { marginLeft: 10, marginTop: 12 },
+    btnsettings: { marginLeft: 10, marginTop: 12 },
+    maincontainer: { width: '90%', height: 450, backgroundColor: 'gray', marginTop: -150, borderRadius: 20 },
+    topview: { flexDirection: 'row', width: '100%' },
+    bottomview: { flexDirection: 'row' },
+    view: { width: 150, height: 150, backgroundColor: 'darkgray', margin: 10, marginTop: 50, borderRadius: 10 },
+    view2: { width: 200, height: 150, backgroundColor: 'darkgray', margin: 10, marginTop: 50, borderRadius: 10 },
+    addview: { width: 100, height: 150, margin: 10, marginTop: 50, borderRadius: 10 },
+    footerView: { position: 'absolute', bottom: 0, width: '100%', height: 250, backgroundColor: 'lightgreen', borderTopLeftRadius: 20, borderTopRightRadius: 20 },
+    text1: { fontSize: 20, fontWeight: 'bold', color: 'white', marginTop: 50, textAlign: 'center' },
+    modalBackground: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
+    modalContainer: { width: '80%', backgroundColor: 'white', padding: 20, borderRadius: 10, alignItems: 'center' },
+    modalTitleText: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+    input: { width: '60%', height: 50, borderWidth: 1, borderColor: '#ccc', borderRadius: 10, textAlign: 'center', fontSize: 25, marginBottom: 20, color: 'green' },
+    button: { backgroundColor: '#007bff', paddingVertical: 10, paddingHorizontal: 30, borderRadius: 10 },
+    buttonText: { color: 'white', fontSize: 18 },
+    modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
+    modalContent: { width: '80%', backgroundColor: '#fff', borderRadius: 12, padding: 16 },
+    option: { paddingVertical: 10, paddingHorizontal: 8 },
+    optionText: { fontSize: 16 },
+    closeBtn: { marginTop: 10, alignSelf: 'flex-end' },
+    closeText: { color: 'red' },
+    //fake screen View
+    FilesView: {
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'gray'
+    },
+    filesheader: {
+        width: '100%',
+        height: 40,
+        flexDirection: 'row',
+        marginTop: 20
+    },
+    btnnewfolder: {
+        position: 'absolute',
+        left: 200,
 
-  },
-  btnsort: {
-    position: 'absolute',
-    left: 260,
-  },
-  btngrid: {
-    position: 'absolute',
-    left: 310,
-  },
-  passwordView: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'gray'
-  },
-  foldermodalContainer: {
-    flex: 1,
-    height: 60, width: '100%'
-  },
-  fileItem: {
-    padding: 10,
-    marginTop: 150,
-    marginVertical: 5,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 8,
-  },
-  fileText: {
-    fontSize: 16,
-  },
-  foldereditView: {
-    width: '100%',
-    height: 70,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around', // Aligns children with space between them
-    paddingHorizontal: 10
-  },
-  renameInput: {
-    width: '100%',
-    height: 40,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-  },
-  // New styles for the rename modal
-  renameModalContent: {
-    width: '80%',
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  renameModalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  renameButtonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-  },
-  renameModalButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ccc'
-  },
-  renameModalButtonText: {
-    fontSize: 16,
-    color: 'black',
-  },
-  renameButton: {
+    },
+    btnsort: {
+        position: 'absolute',
+        left: 260,
+    },
+    btngrid: {
+        position: 'absolute',
+        left: 310,
+    },
+    passwordView: {
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'gray'
+    },
+    foldermodalContainer: {
+        flex: 1,
+        height: 60, width: '100%'
+    },
+    fileItem: {
+        padding: 10,
+        marginTop: 20,
+        marginLeft:20,
+        backgroundColor: '#e0e0e0',
+        borderRadius: 8,
+        width:'80%',
+        height:50,
+    },
+    fileText: {
+        fontSize: 16,
+    },
+    foldereditView: {
+        width: '100%',
+        height: 70,
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 20,
+        justifyContent: 'space-around', // Aligns children with space between them
+        paddingHorizontal: 10
+    },
+    renameInput: {
+        width: '100%',
+        height: 40,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        paddingHorizontal: 10,
+        marginBottom: 15,
+    },
+    // New styles for the rename modal
+    renameModalContent: {
+        width: '80%',
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    renameModalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    renameButtonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        width: '100%',
+    },
+    renameModalButton: {
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#ccc'
+    },
+    renameModalButtonText: {
+        fontSize: 16,
+        color: 'black',
+    },
+    renameButton: {
+
+        padding: 10,
+        borderRadius: 5,
+        marginLeft: 20,
+        marginTop: 10,
+
+    },
+    // This is the new style to make the grid view look good
+    row: {
+        justifyContent: 'space-between',
+        paddingHorizontal: 10,
+    },
+    // This is the new style for each folder item in grid view
+    folderGridItem: {
+        width: '48%',
+        backgroundColor: 'white',
+        borderRadius: 8,
+        padding: 10,
+        marginTop: 10,
+        marginBottom: 10,
+        alignItems: 'center',
+    },
+    // This is the original style for each folder item in list view
+    folderItem: {
+        backgroundColor: 'white',
+        borderRadius: 8,
+        padding: 10,
+        width: '50%',
+        height: 40,
+        marginLeft: 20,
+        marginTop: 10,
+    },
+    btnadd: {
+        width: 40,
+        height: 40,
+        position: 'absolute',
+        bottom: 30,
+        right: 30
+    },
     
-    padding: 10,
-    borderRadius: 5,
-    marginLeft: 20,
-    marginTop:10,
-    
-  }
 });
