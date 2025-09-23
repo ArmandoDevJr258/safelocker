@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   StyleSheet,
   Text,
@@ -20,6 +20,33 @@ export default function App() {
   const [folders, setFolders] = useState([]);
   const [folderModalVisible, setFolderModalVisible] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState(null);
+  const [folderedit, setfolderedit] = useState(false);
+  const [header, setheader] = useState(true);
+  const [newFolderName, setNewFolderName] = useState('');
+  const [renameModalVisible, setRenameModalVisible] = useState(false); // New state for the rename modal
+
+  // delete folder
+  const deleteFolder = (id) => {
+    setFolders(prev => prev.filter(folder => folder.id !== id));
+  };
+
+  const handleDelete = async () => {
+    if (!selectedFolder) return;
+    const updatedFolders = folders.filter(f => f.id !== selectedFolder.id);
+    setFolders(updatedFolders);
+    setSelectedFolder(null);
+    setfolderedit(false);
+    setheader(true);
+
+    // persist
+    await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
+  };
+
+  useEffect(() => {
+    if (selectedFolder) {
+      setNewFolderName(selectedFolder.name);
+    }
+  }, [selectedFolder]);
 
   // PIN states
   const [pinModalVisible, setPinModalVisible] = useState(true);
@@ -29,7 +56,7 @@ export default function App() {
 
   const [langModalVisible, setLangModalVisible] = useState(false);
 
-  //fake screens
+  // fake screens
   const [myFiles, setmyFiles] = useState(false);
   const [myPasswords, setmyPasswords] = useState(false);
   const [myTrashbean, setmyTrashbean] = useState(false);
@@ -75,16 +102,16 @@ export default function App() {
     }
   };
 
-
   // Render each file in FlatList
-const renderFile = ({ item }) => (
+  const renderFile = ({ item }) => (
     <TouchableOpacity
-        style={styles.fileItem}
-        onPress={() => Alert.alert('File selected', item.name)}
+      style={styles.fileItem}
+      onPress={() => Alert.alert('File selected', item.name)}
     >
-        <Text style={styles.fileText}>{item.name}</Text>
+      <Text style={styles.fileText}>{item.name}</Text>
     </TouchableOpacity>
-);
+  );
+
   useEffect(() => {
     const loadSettings = async () => {
       try {
@@ -199,6 +226,28 @@ const renderFile = ({ item }) => (
     }
   };
 
+  // New rename functions
+  const handleRenameSave = async () => {
+    if (!selectedFolder || newFolderName.trim() === '') {
+      Alert.alert('Invalid Name', 'Folder name cannot be empty.');
+      return;
+    }
+    const updatedFolders = folders.map(f =>
+      f.id === selectedFolder.id ? { ...f, name: newFolderName } : f
+    );
+    setFolders(updatedFolders);
+    setSelectedFolder({ ...selectedFolder, name: newFolderName });
+    setRenameModalVisible(false);
+    setfolderedit(false);
+    setheader(true);
+    await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
+  };
+
+  const handleRenameCancel = () => {
+    setRenameModalVisible(false);
+    setNewFolderName(selectedFolder?.name || '');
+  };
+
   const translations = {
     en: {
       greeting: 'Hello',
@@ -210,6 +259,8 @@ const renderFile = ({ item }) => (
       Mytrashbean: 'My trash bean',
       enterPin: settingPin ? 'Set your PIN' : 'Enter PIN',
       Cancel: 'Cancel',
+      Rename: 'Rename', // Added Rename text
+      Save: 'Save' // Added Save text
     },
     fr: {
       greeting: 'Bonjour',
@@ -221,6 +272,8 @@ const renderFile = ({ item }) => (
       Mytrashbean: 'Poubelle',
       enterPin: settingPin ? 'Définir votre PIN' : 'Entrez le PIN',
       Cancel: 'Annuler',
+      Rename: 'Renommer',
+      Save: 'Enregistrer'
     },
     pt: {
       greeting: 'Olá',
@@ -232,6 +285,8 @@ const renderFile = ({ item }) => (
       Mytrashbean: 'Pasta de lixo',
       enterPin: settingPin ? 'Defina seu PIN' : 'Digite o PIN',
       Cancel: 'Cancelar',
+      Rename: 'Renomear',
+      Save: 'Salvar'
     },
   };
 
@@ -254,10 +309,35 @@ const renderFile = ({ item }) => (
               secureTextEntry
               maxLength={4}
               placeholder="****"
+              placeholderTextColor={'blue'}
             />
             <TouchableOpacity style={styles.button} onPress={handlePinSubmit}>
               <Text style={styles.buttonText}>{settingPin ? 'Set PIN' : 'Submit'}</Text>
             </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Rename Modal */}
+      <Modal visible={renameModalVisible} transparent animationType="fade">
+        <View style={styles.modalBackground}>
+          <View style={styles.renameModalContent}>
+            <Text style={styles.renameModalTitle}>Rename Folder</Text>
+            <TextInput
+              style={styles.renameInput}
+              value={newFolderName}
+              onChangeText={setNewFolderName}
+              placeholder="Enter new folder name"
+              autoFocus={true}
+            />
+            <View style={styles.renameButtonContainer}>
+              <TouchableOpacity style={styles.renameModalButton} onPress={handleRenameCancel}>
+                <Text style={styles.renameModalButtonText}>{t('Cancel')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.renameModalButton, { backgroundColor: '#007bff' }]} onPress={handleRenameSave}>
+                <Text style={[styles.renameModalButtonText, { color: 'white' }]}>{t('Save')}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
@@ -329,7 +409,7 @@ const renderFile = ({ item }) => (
         <Modal
           onRequestClose={() => setmyFiles(false)}>
           <View style={styles.FilesView}>
-            <View style={styles.filesheader}>
+            {header && (<View style={styles.filesheader}>
               <Text style={{ marginLeft: 20, fontSize: 20, fontWeight: 'bold', color: 'white' }}>{t('Myfiles')}</Text>
               <TouchableOpacity style={styles.btnnewfolder} onPress={addNewFolder}>
                 <Image
@@ -349,53 +429,87 @@ const renderFile = ({ item }) => (
                   style={{ width: 20, height: 20 }}
                 />
               </TouchableOpacity>
-            </View>
-            <FlatList
-              data={folders}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() => {
-                    setSelectedFolder(item);
-                    setFolderModalVisible(true);
-                  }}
-                  onLongPress={() => Alert.alert('Long Press', `You long-pressed ${item.name}`)}
+            </View>)}
+            {folderedit && (
+              <View style={styles.foldereditView}>
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={{ marginLeft: 20, color: 'white', fontSize: 15, fontWeight: 'bold', marginTop: 20, flex: 1 }}
                 >
-                  <View style={{
-                    padding: 10,
-                    margin: 5,
-                    backgroundColor: 'lightgray',
-                    borderRadius: 8,
-                    width: '50%',
-                    marginLeft: 20
-                  }}>
-                    <Text>{item.name}</Text>
-                  </View>
+                  {selectedFolder?.name}
+                </Text>
+                <TouchableOpacity
+                  style={styles.renameButton}
+                  onPress={() => {
+                    setRenameModalVisible(true);
+                  }}
+                >
+                  <Text style={{ fontSize: 20 }}>{t('Rename')}</Text>
                 </TouchableOpacity>
-              )}
-            />
+
+                {/* Delete Button */}
+                <TouchableOpacity style={{ marginTop: 17, marginLeft: 20 }} onPress={handleDelete}>
+                  <Image
+                    source={require('./assets/delete.png')}
+                    style={{ width: 20, height: 20 }}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
+
+            <View >
+              <FlatList
+                data={folders}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSelectedFolder(item);
+                      setFolderModalVisible(true);
+                    }}
+                    onLongPress={() => {
+                      setSelectedFolder(item); // set the folder to delete
+                      setheader(false);
+                      setfolderedit(true);
+                    }}
+                  >
+                    <View style={{
+                      padding: 10,
+                      marginTop: 10,  // <- current value
+                      backgroundColor: 'lightgray',
+                      borderRadius: 8,
+                      width: '50%',
+                      marginLeft: 20
+                    }}>
+                      <Text>{item.name}</Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
           </View>
         </Modal>
       )}
 
       {/* The Folder Modal */}
       <Modal visible={folderModalVisible}
-       animationType="slide"
-       onRequestClose={() => setFolderModalVisible(false)}>
-    <View style={styles.foldermodalContainer}>
-        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{selectedFolder?.name}</Text>
-        <Text style={{ marginTop: 10 }}>This is a fake folder screen.</Text>
+        animationType="slide"
+        onRequestClose={() => setFolderModalVisible(false)}>
+        <View style={styles.foldermodalContainer}>
+          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{selectedFolder?.name}</Text>
+          <Text style={{ marginTop: 10 }}>This is a fake folder screen.</Text>
 
-        <FlatList
+          <FlatList
             data={selectedFolder?.files || []}
             keyExtractor={(item) => item.id}
             renderItem={renderFile}
             contentContainerStyle={{ paddingTop: 20, margin: 30 }}
-        />
+          />
 
-        {/* ... (Your other code for the add file button) */}
-    </View>
-</Modal>
+          {/* ... (Your other code for the add file button) */}
+        </View>
+      </Modal>
 
       {myPasswords && (
         <Modal
@@ -436,7 +550,7 @@ const styles = StyleSheet.create({
   modalBackground: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
   modalContainer: { width: '80%', backgroundColor: 'white', padding: 20, borderRadius: 10, alignItems: 'center' },
   modalTitleText: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-  input: { width: '60%', height: 50, borderWidth: 1, borderColor: '#ccc', borderRadius: 10, textAlign: 'center', fontSize: 20, marginBottom: 20 },
+  input: { width: '60%', height: 50, borderWidth: 1, borderColor: '#ccc', borderRadius: 10, textAlign: 'center', fontSize: 25, marginBottom: 20, color: 'green' },
   button: { backgroundColor: '#007bff', paddingVertical: 10, paddingHorizontal: 30, borderRadius: 10 },
   buttonText: { color: 'white', fontSize: 18 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
@@ -445,7 +559,6 @@ const styles = StyleSheet.create({
   optionText: { fontSize: 16 },
   closeBtn: { marginTop: 10, alignSelf: 'flex-end' },
   closeText: { color: 'red' },
-
   //fake screen View
   FilesView: {
     width: '100%',
@@ -455,7 +568,8 @@ const styles = StyleSheet.create({
   filesheader: {
     width: '100%',
     height: 40,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    marginTop: 20
   },
   btnnewfolder: {
     position: 'absolute',
@@ -470,22 +584,77 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 310,
   },
-
   passwordView: {
     width: '100%',
     height: '100%',
     backgroundColor: 'gray'
   },
   foldermodalContainer: {
-    flex: 1
+    flex: 1,
+    height: 60, width: '100%'
   },
   fileItem: {
     padding: 10,
+    marginTop: 150,
     marginVertical: 5,
     backgroundColor: '#e0e0e0',
     borderRadius: 8,
   },
   fileText: {
     fontSize: 16,
+  },
+  foldereditView: {
+    width: '100%',
+    height: 70,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around', // Aligns children with space between them
+    paddingHorizontal: 10
+  },
+  renameInput: {
+    width: '100%',
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+  },
+  // New styles for the rename modal
+  renameModalContent: {
+    width: '80%',
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  renameModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  renameButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+  },
+  renameModalButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc'
+  },
+  renameModalButtonText: {
+    fontSize: 16,
+    color: 'black',
+  },
+  renameButton: {
+    
+    padding: 10,
+    borderRadius: 5,
+    marginLeft: 20,
+    marginTop:10,
+    
   }
 });

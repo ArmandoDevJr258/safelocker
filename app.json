@@ -4,7 +4,7 @@
     "slug": "safelocker",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/Safelocker.png",
+    "icon": "./assets/Safelocker1.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
