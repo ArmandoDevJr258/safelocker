@@ -79,6 +79,18 @@ export default function App() {
     setFlatListKey(prevKey => prevKey + 1);
   };
 
+const showAlert = (file) => {
+  Alert.alert(
+    "Delete File",
+    `Are you sure you want to delete "${file.name}"?`,
+    [
+      { text: "Cancel", style: "cancel" },
+      { text: "Delete", style: "destructive", onPress: () => handleDeleteFile2(file) }
+    ],
+    { cancelable: false }
+  );
+};
+
   const deleteFolder = (id) => {
     setFolders(prev => prev.filter(folder => folder.id !== id));
   };
@@ -100,6 +112,25 @@ export default function App() {
     setheader(true);
     await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
   };
+  const handleDeleteFile2 = async (file) => {
+  if (!selectedFolder) return;
+
+  const updatedFiles = selectedFolder.files.filter(f => f.id !== file.id);
+
+  // Update folders array
+  const updatedFolders = folders.map(folder => {
+    if (folder.id === selectedFolder.id) {
+      return { ...folder, files: updatedFiles };
+    }
+    return folder;
+  });
+
+  setFolders(updatedFolders);
+  setSelectedFolder({ ...selectedFolder, files: updatedFiles });
+
+  // Save to AsyncStorage
+  await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
+};
 
   // Pick a file from device – fixed
   const pickFile = async () => {
@@ -142,11 +173,11 @@ export default function App() {
   };
 
   // Render each file in FlatList
-  const renderFile = ({ item }) => (
-    <TouchableOpacity style={styles.fileItem} onPress={() => Alert.alert('File selected', item.name)}>
-      <Text style={styles.fileText}>{item.name}</Text>
-    </TouchableOpacity>
-  );
+const renderFile = ({ item }) => (
+  <TouchableOpacity style={styles.fileItem} onPress={() => showAlert(item)}>
+    <Text style={styles.fileText}>{item.name}</Text>
+  </TouchableOpacity>
+);
 
   useEffect(() => {
     const loadSettings = async () => {
