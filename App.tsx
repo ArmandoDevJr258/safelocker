@@ -940,7 +940,7 @@ const renderFile = ({ item }) => (
 const styles = StyleSheet.create({
     container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
     dark: { backgroundColor: '#1A1A2E' },
-    light: { backgroundColor: '#fff' },
+    light: { backgroundColor: '#E0F0FF' },
     header: { position: 'absolute', top: 20, width: '100%', height: 45, flexDirection: 'row', gap: 20 },
     appName: { fontSize: 30, fontWeight: 'bold', color: 'orange', },
     btnmode: { marginLeft: 20, marginTop: 12 },
