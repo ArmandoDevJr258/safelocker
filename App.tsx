@@ -390,7 +390,10 @@ const renderFile = ({ item }) => (
       FileManagement:'File Managment',
       Security:'Security & Privacy',
       AboutApp:'About App',
-      Talktodevteam:'Contact developer team'
+      Talktodevteam:'Contact developer team',
+      Help:"Help",
+      FAQ:'FAQ',
+      Erase:'Clear App Data'
     },
      fr: {
     greeting: 'Bonjour',
@@ -415,6 +418,9 @@ const renderFile = ({ item }) => (
     Security: 'Sécurité et confidentialité',
     AboutApp: "À propos de l'application",
     Talktodevteam: 'Contacter l’équipe de développeurs',
+    Help:"Aidé",
+    FAQ:'FAQ',
+    Erase:'Nettoyer ,'
   },
     pt: {
       greeting: 'Olá',
@@ -438,7 +444,10 @@ const renderFile = ({ item }) => (
       FileManagement:'gestão de ficheiros',
       Security:'Segurança & privacidade',
       AboutApp:'Sobre o aplicativo',
-      Talktodevteam:'Contactar a equipe de densevolvedores'
+      Talktodevteam:'Contactar a equipe de densevolvedores',
+      Help:"ajuda",
+      FAQ:'FAQ',
+      Erase:'Limpar os dados da aplicação'
     },
   };
 
@@ -872,6 +881,61 @@ const renderFile = ({ item }) => (
            }}>{t('Talktodevteam')}</Text>
           
               </TouchableOpacity>
+               <TouchableOpacity
+           style={{
+                width:'90%',
+                 backgroundColor:'darkgray',
+                borderRadius:10,
+                marginTop:10,
+                alignSelf:'center'
+                
+               }}>
+                 <Text style={{
+            fontSize:20,
+            fontWeight:'bold',
+            marginLeft:40,
+             padding:10
+           }}>{t('Help')}</Text>
+          
+              </TouchableOpacity>
+
+               <TouchableOpacity
+           style={{
+                width:'90%',
+                 backgroundColor:'darkgray',
+                borderRadius:10,
+                marginTop:10,
+                alignSelf:'center'
+                
+               }}>
+                 <Text style={{
+            fontSize:20,
+            fontWeight:'bold',
+            marginLeft:40,
+             padding:10
+           }}>{t('FAQ')}</Text>
+          
+              </TouchableOpacity>
+
+               <TouchableOpacity
+           style={{
+                width:'90%',
+                 backgroundColor:'darkgray',
+                borderRadius:10,
+                marginTop:10,
+                alignSelf:'center'
+                
+               }}>
+                 <Text style={{
+            fontSize:20,
+            fontWeight:'bold',
+            marginLeft:40,
+             padding:10
+           }}>{t('Erase')}</Text>
+          
+              </TouchableOpacity>
+          
+          
           
           
          
