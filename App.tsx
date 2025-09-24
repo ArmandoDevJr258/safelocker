@@ -33,7 +33,8 @@ export default function App() {
     const [trash, setTrash] = useState([]);
 // selected items ids in trash
   const [selectedTrashItems, setSelectedTrashItems] = useState([]);
-  const [selectionMode, setSelectionMode] = useState(false); // show action header
+  const [selectionMode, setSelectionMode] = useState(false); 
+  const [file,setfile]=useState(false);
 
 
 
@@ -245,7 +246,7 @@ const renderFile = ({ item }) => (
       setSelectedFile(item);
       setFileModalVisible(true);
     }}
-    onLongPress={() => showAlert(item)}
+    onLongPress={()=>setfile(true)}
   >
     <Text style={styles.fileText}>{item.name}</Text>
   </TouchableOpacity>
@@ -828,7 +829,7 @@ const renderFile = ({ item }) => (
     <View style={styles.trashview}>
       <View style={{
         width:'100%',
-        height:40,
+        height:30,
         flexDirection:'row',
         marginTop:20
       }}>
@@ -933,6 +934,109 @@ const renderFile = ({ item }) => (
 
 
 
+{myPasswords&&(
+  <Modal onRequestClose={()=>setmyPasswords(false)}>
+    <View>
+      <View style={{
+        width:'100%',
+        height:30,
+        flexDirection:'row',
+        marginTop:20
+      }}>
+        <Text
+        style={{
+          marginLeft:20,
+         
+          fontWeight:'bold',
+          fontSize:20
+        }}>My Passswords</Text>
+         <TouchableOpacity style={{ marginTop: 5, marginLeft: 100 }} >
+                    <Image
+                      source={require('./assets/key3.png')}
+                      style={{ width: 25, height: 25 }}
+                    />
+        </TouchableOpacity>
+        <TouchableOpacity style={{ marginTop: 5, marginLeft: 40 }} >
+                    <Image
+                      source={require('./assets/wallet.png')}
+                      style={{ width: 25, height: 25 }}
+                    />
+        </TouchableOpacity>
+        
+      </View>
+
+      <View style={{
+        width:'100%',
+        height:'100%',
+        
+      }}>
+
+      </View>
+    </View>
+  </Modal>
+)}
+
+{file&&(
+  <Modal transparent
+  onRequestClose={()=>setfile(false)}>
+    <View style={{
+   
+      width:'100%',
+      height:50,
+      backgroundColor:'darkgray',
+      marginTop:0,
+      flexDirection:'row',
+      
+
+    }}>
+       <TouchableOpacity style={{
+        marginLeft:40,
+        marginTop:20
+       }}>
+        <Image 
+        source={require('./assets/info.png')}
+        style={{width:20,height:20}}/>
+      </TouchableOpacity>
+       <TouchableOpacity
+        style={{
+        marginLeft:50,
+        marginTop:20
+       }}>
+        <Image 
+        source={require('./assets/copy.png')}
+        style={{width:20,height:20}}/>
+      </TouchableOpacity>
+       <TouchableOpacity
+        style={{
+        marginLeft:50,
+        marginTop:20
+       }}>
+        <Image 
+        source={require('./assets/star.png')}
+        style={{width:20,height:20}}/>
+      </TouchableOpacity>
+       <TouchableOpacity
+        style={{
+        marginLeft:50,
+        marginTop:20
+       }}>
+        <Image 
+        source={require('./assets/download.png')}
+        style={{width:20,height:20}}/>
+      </TouchableOpacity>
+      <TouchableOpacity
+       style={{
+        marginLeft:50,
+        marginTop:20
+       }}>
+        <Image 
+        source={require('./assets/share2.png')}
+        style={{width:20,height:20}}/>
+      </TouchableOpacity>
+
+    </View>
+  </Modal>
+)}
     </View>
   );
 }
@@ -1120,7 +1224,7 @@ const styles = StyleSheet.create({
     width:'100%',
     height:'100%',
     backgroundColor:'gray',
-    marginTop:10
+    marginTop:0
 
   },
   trashItem:{
