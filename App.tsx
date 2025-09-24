@@ -28,7 +28,12 @@ export default function App() {
   const [flatListKey, setFlatListKey] = useState(0);
   const [isGridView, setIsGridView] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-const [fileModalVisible, setFileModalVisible] = useState(false);
+   const [fileModalVisible, setFileModalVisible] = useState(false);
+    const [trash, setTrash] = useState([]);
+// selected items ids in trash
+  const [selectedTrashItems, setSelectedTrashItems] = useState([]);
+  const [selectionMode, setSelectionMode] = useState(false); // show action header
+
 
 
   // PIN states
@@ -43,6 +48,7 @@ const [fileModalVisible, setFileModalVisible] = useState(false);
   const [myFiles, setmyFiles] = useState(false);
   const [myPasswords, setmyPasswords] = useState(false);
   const [setttingsView,setsettingsView]= useState(false);
+  const [trashView,settrashView]= useState(false);
 
   // Load saved folders from AsyncStorage on mount
   useEffect(() => {
@@ -82,7 +88,39 @@ const [fileModalVisible, setFileModalVisible] = useState(false);
     setIsGridView(!isGridView);
     setFlatListKey(prevKey => prevKey + 1);
   };
+const restoreItems = async () => {
+  const restoredItems = trash.filter(t => selectedTrashItems.includes(t.id));
+  let updatedFolders = [...folders];
 
+  restoredItems.forEach(item => {
+    if (item.type === 'file') {
+      updatedFolders = updatedFolders.map(f =>
+        f.id === item.fromFolderId ? { ...f, files: [...f.files, item] } : f
+      );
+    }
+    if (item.type === 'folder') {
+      updatedFolders = [...updatedFolders, item];
+    }
+  });
+
+  setFolders(updatedFolders);
+  await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
+
+  const newTrash = trash.filter(t => !selectedTrashItems.includes(t.id));
+  setTrash(newTrash);
+  await AsyncStorage.setItem('trash', JSON.stringify(newTrash));
+
+  setSelectionMode(false);
+  setSelectedTrashItems([]);
+};
+// delete permanently
+const deletePermanently = async () => {
+  const newTrash = trash.filter(t => !selectedTrashItems.includes(t.id));
+  setTrash(newTrash);
+  await AsyncStorage.setItem('trash', JSON.stringify(newTrash));
+  setSelectionMode(false);
+  setSelectedTrashItems([]);
+};
 const showAlert = (file) => {
   Alert.alert(
     "Delete File",
@@ -100,26 +138,48 @@ const showAlert = (file) => {
   };
 
   const handleDelete = async () => {
-    if (!selectedFolder) return;
-    if (selectedFolder.id === 'default_folder') {
-      Alert.alert('Cannot Delete', 'This is a permanent folder.');
-      setSelectedFolder(null);
-      setfolderedit(false);
-      setheader(true);
-      return;
-    }
+  if (!selectedFolder) return;
+  if (selectedFolder.id === 'default_folder') {
+    Alert.alert('Cannot Delete', 'This is a permanent folder.');
+    return;
+  }
 
-    const updatedFolders = folders.filter(f => f.id !== selectedFolder.id);
-    setFolders(updatedFolders);
-    setSelectedFolder(null);
-    setfolderedit(false);
-    setheader(true);
-    await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
+  // move whole folder to trash
+  const deletedFolder = { ...selectedFolder, type: 'folder' };
+  const newTrash = [...trash, deletedFolder];
+  setTrash(newTrash);
+  await AsyncStorage.setItem('trash', JSON.stringify(newTrash));
+
+  // then remove it from folders
+  const updatedFolders = folders.filter(f => f.id !== selectedFolder.id);
+  setFolders(updatedFolders);
+  await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
+
+  setSelectedFolder(null);
+  setfolderedit(false);
+  setheader(true);
+};
+
+useEffect(() => {
+  const loadTrash = async () => {
+    const savedTrash = await AsyncStorage.getItem('trash');
+    if (savedTrash) setTrash(JSON.parse(savedTrash));
   };
+  loadTrash();
+}, []);
+
+
   const handleDeleteFile2 = async (file) => {
   if (!selectedFolder) return;
 
+  // Remove file from folder
   const updatedFiles = selectedFolder.files.filter(f => f.id !== file.id);
+
+  // Add deleted file to trash
+  const deletedItem = { ...file, fromFolderId: selectedFolder.id, type: 'file' };
+  const newTrash = [...trash, deletedItem];
+  setTrash(newTrash);
+  await AsyncStorage.setItem('trash', JSON.stringify(newTrash));
 
   // Update folders array
   const updatedFolders = folders.map(folder => {
@@ -132,7 +192,7 @@ const showAlert = (file) => {
   setFolders(updatedFolders);
   setSelectedFolder({ ...selectedFolder, files: updatedFiles });
 
-  // Save to AsyncStorage
+  // Save folders
   await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
 };
 
@@ -477,7 +537,7 @@ const renderFile = ({ item }) => (
           </TouchableOpacity>
         </View>
         <View style={styles.bottomview}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=>settrashView(true)}>
             <View style={styles.view2}>
               <Image
               source={require('./assets/recycle-bin.png')}
@@ -750,6 +810,95 @@ const renderFile = ({ item }) => (
   </View>
 </Modal>
 
+{trashView && (
+  <Modal onRequestClose={() => settrashView(false)}>
+    <View style={styles.trashview}>
+      <View style={{
+        width:'100%',
+        height:40,
+        flexDirection:'row',
+        marginTop:20
+      }}>
+        <Text style={{ marginLeft: 20, fontSize: 20, fontWeight: 'bold' }}>
+          Trash
+        </Text>
+        <TouchableOpacity
+        style={{
+          marginLeft:250,
+          marginTop:5
+        }}>
+          <Image
+          source={require('./assets/column.png')}
+          style={{width:20,height:20}}
+          />
+        </TouchableOpacity>
+      </View>
+<View style={styles.maintrashcontainer}>
+ <FlatList
+        data={trash}
+        keyExtractor={item => item.id.toString()}
+        renderItem={({ item }) => {
+          const isSelected = selectedTrashItems.includes(item.id);
+          return (
+            <TouchableOpacity
+              style={[
+                styles.trashItem,
+                isSelected && { backgroundColor: '#444' }
+              ]}
+              onLongPress={() => {
+                if (!selectionMode) {
+                  setSelectionMode(true);
+                  setSelectedTrashItems([item.id]);
+                }
+              }}
+              onPress={() => {
+                if (selectionMode) {
+                  if (isSelected) {
+                    setSelectedTrashItems(selectedTrashItems.filter(id => id !== item.id));
+                  } else {
+                    setSelectedTrashItems([...selectedTrashItems, item.id]);
+                  }
+                }
+              }}
+            >
+              <Text style={{ color: 'white' }}>{item.name} ({item.type})</Text>
+            </TouchableOpacity>
+          );
+        }}
+      />
+</View>
+     
+
+      {selectionMode && (
+        <View style={styles.actionHeader}>
+          <TouchableOpacity onPress={restoreItems}>
+            <Text style={{
+              color:'green',
+              fontSize:20,
+              fontWeight:'bold'
+
+            }}>Restore</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={deletePermanently}>
+            <Text style={{
+              color:'red',fontSize:20,fontWeight:'bold'
+            }}>Delete</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setSelectionMode(false);
+              setSelectedTrashItems([]);
+            }}
+          >
+            <Text style={styles.actionText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    </View>
+  </Modal>
+)}
+
+
 
     </View>
   );
@@ -928,6 +1077,40 @@ const styles = StyleSheet.create({
   filemodalContainer:{
     width:'100%',
     height:400
-  }
+  },
+  trashview:{
+    width:'100%',
+    height:'100%',
+    backgroundColor:'#d3e7d3ff'
+  },
+  maintrashcontainer:{
+    width:'100%',
+    height:'100%',
+    backgroundColor:'gray',
+    marginTop:10
+
+  },
+  trashItem:{
+    marginLeft:20,
+    height:50,
+    maxWidth:130,
+    marginTop:10,
+    color:'red'
+  },
+  actionHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-around',
+  alignItems: 'center',
+  height: 50,
+  backgroundColor: '#d3e7d3ff',
+  position:'absolute',
+  top:10,
+  width:'100%'
+},
+actionText: {
+  color: 'white',
+  fontSize: 20,
+  fontWeight: 'bold'
+},
     
 });
