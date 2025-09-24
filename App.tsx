@@ -27,6 +27,7 @@ export default function App() {
   const [renameModalVisible, setRenameModalVisible] = useState(false);
   const [flatListKey, setFlatListKey] = useState(0);
   const [isGridView, setIsGridView] = useState(false);
+  const [isGrid, setIsGrid] = useState(false); 
   const [selectedFile, setSelectedFile] = useState(null);
    const [fileModalVisible, setFileModalVisible] = useState(false);
     const [trash, setTrash] = useState([]);
@@ -379,7 +380,8 @@ const renderFile = ({ item }) => (
       Rename: 'Rename',
       Save: 'Save',
       untitledfolder:'Untitled folder',
-      EmptyFolder:'empty folder'
+      EmptyFolder:'empty folder',
+      viewAll:'View all'
     },
     fr: {
       greeting: 'Bonjour',
@@ -393,7 +395,8 @@ const renderFile = ({ item }) => (
       Cancel: 'Annuler',
       Rename: 'Renommer',
       Save: 'Enregistrer',
-       EmptyFolder:'No files added yet'
+       EmptyFolder:'No files added yet',
+       viewAll:'View all'
     },
     pt: {
       greeting: 'Olá',
@@ -408,7 +411,8 @@ const renderFile = ({ item }) => (
       Rename: 'Renomear',
       Save: 'Salvar',
       untitledfolder:'pasta sem nome',
-       EmptyFolder:'pasta vazia'
+       EmptyFolder:'pasta vazia',
+       viewAll:'Ver tudo'
     },
   };
 
@@ -570,12 +574,21 @@ const renderFile = ({ item }) => (
         marginTop:30,
        
       }}>
-        <Text style={{
-          fontSize:30,
+        <View style={styles.header}>
+ <Text style={{
+          fontSize:20,
           fontWeight:'bold',
           marginLeft:20,
           marginTop:10
         }}>{t('recentactivity')}</Text>
+        <Text style={{
+          fontSize:15,
+          fontWeight:'bold',
+          marginLeft:80,
+          marginTop:15
+        }}>{t('viewAll')}</Text>
+        </View>
+       
       </View>
 
       {/* Language Modal */}
@@ -826,7 +839,12 @@ const renderFile = ({ item }) => (
         style={{
           marginLeft:250,
           marginTop:5
-        }}>
+        }}
+       onPress={() => {
+  setIsGrid(prev => !prev);
+  setFlatListKey(prev => prev + 1);
+}}
+>
           <Image
           source={require('./assets/column.png')}
           style={{width:20,height:20}}
@@ -834,39 +852,52 @@ const renderFile = ({ item }) => (
         </TouchableOpacity>
       </View>
 <View style={styles.maintrashcontainer}>
- <FlatList
-        data={trash}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({ item }) => {
-          const isSelected = selectedTrashItems.includes(item.id);
-          return (
-            <TouchableOpacity
-              style={[
-                styles.trashItem,
-                isSelected && { backgroundColor: '#444' }
-              ]}
-              onLongPress={() => {
-                if (!selectionMode) {
-                  setSelectionMode(true);
-                  setSelectedTrashItems([item.id]);
-                }
-              }}
-              onPress={() => {
-                if (selectionMode) {
-                  if (isSelected) {
-                    setSelectedTrashItems(selectedTrashItems.filter(id => id !== item.id));
-                  } else {
-                    setSelectedTrashItems([...selectedTrashItems, item.id]);
-                  }
-                }
-              }}
-            >
-              <Text style={{ color: 'white' }}>{item.name} ({item.type})</Text>
-            </TouchableOpacity>
-          );
-        }}
-      />
+  <FlatList
+    key={flatListKey} // forces re-render when layout changes
+    data={trash}
+    keyExtractor={(item) => item.id.toString()}
+    numColumns={isGrid ? 2 : 1}
+    columnWrapperStyle={isGrid ? { justifyContent: 'space-between', marginBottom: 10 } : null}
+    renderItem={({ item }) => {
+      const isSelected = selectedTrashItems.includes(item.id);
+      return (
+        <TouchableOpacity
+          style={[
+            styles.trashItem,
+            isGrid && { width: '48%' }, // only set width in grid mode
+            isSelected && {
+                marginLeft:20,
+    height:70,
+    maxWidth:150,
+    marginTop:10,
+    backgroundColor:'#ba7a7aff',
+    borderRadius:10,
+    padding:10
+            } // <-- changed to red
+          ]}
+          onLongPress={() => {
+            if (!selectionMode) {
+              setSelectionMode(true);
+              setSelectedTrashItems([item.id]);
+            }
+          }}
+          onPress={() => {
+            if (selectionMode) {
+              if (isSelected) {
+                setSelectedTrashItems(selectedTrashItems.filter(id => id !== item.id));
+              } else {
+                setSelectedTrashItems([...selectedTrashItems, item.id]);
+              }
+            }
+          }}
+        >
+          <Text style={{ color: 'white' }}>{item.name} ({item.type})</Text>
+        </TouchableOpacity>
+      );
+    }}
+  />
 </View>
+
      
 
       {selectionMode && (
@@ -890,7 +921,9 @@ const renderFile = ({ item }) => (
               setSelectedTrashItems([]);
             }}
           >
-            <Text style={styles.actionText}>Cancel</Text>
+            <Text style={{
+              color:'white',fontSize:20,fontWeight:'bold',
+            }}>Cancel</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -1092,10 +1125,13 @@ const styles = StyleSheet.create({
   },
   trashItem:{
     marginLeft:20,
-    height:50,
-    maxWidth:130,
+    height:70,
+    maxWidth:150,
     marginTop:10,
-    color:'red'
+    backgroundColor:'darkgray',
+    borderRadius:10,
+    padding:10
+   
   },
   actionHeader: {
   flexDirection: 'row',
@@ -1110,7 +1146,8 @@ const styles = StyleSheet.create({
 actionText: {
   color: 'white',
   fontSize: 20,
-  fontWeight: 'bold'
+  fontStyle:'italic',
+  backgroundColor:'red'
 },
     
 });
