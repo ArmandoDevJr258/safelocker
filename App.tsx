@@ -125,15 +125,22 @@ const deletePermanently = async () => {
 };
 const showAlert = (file) => {
   Alert.alert(
-    "Delete File",
-    `Are you sure you want to delete "${file.name}"?`,
+    t('Delete'), // Title
+    `Are you sure you want to delete "${file.name}"?`, // Message
     [
       { text: t('Cancel'), style: "cancel" },
-      { text: t('Delete'), style: "destructive", onPress: () => handleDeleteFile2(file) }
+      { 
+        text: t('Delete'), 
+        style: "destructive", 
+        onPress: async () => {
+          await handleDeleteFile2(file); // delete file and move to trash
+        } 
+      }
     ],
     { cancelable: false }
   );
 };
+
 
   const deleteFolder = (id) => {
     setFolders(prev => prev.filter(folder => folder.id !== id));
@@ -1013,50 +1020,53 @@ const renderFile = ({ item }) => (
         </TouchableOpacity>
       </View>
 <View style={styles.maintrashcontainer}>
-  <FlatList
-    key={flatListKey} // forces re-render when layout changes
-    data={trash}
-    keyExtractor={(item) => item.id.toString()}
-    numColumns={isGrid ? 2 : 1}
-    columnWrapperStyle={isGrid ? { justifyContent: 'space-between', marginBottom: 10 ,alignSelf:'center'} : null}
-    renderItem={({ item }) => {
-      const isSelected = selectedTrashItems.includes(item.id);
-      return (
-        <TouchableOpacity
-          style={[
-            styles.trashItem,
-            isGrid && { width: '55%' }, // only set width in grid mode
-            isSelected && {
-                marginLeft:0,
-    height:70,
-    maxWidth:150,
-    marginTop:10,
-    backgroundColor:'#ba7a7aff',
-    borderRadius:10,
-    padding:10
-            } // <-- changed to red
-          ]}
-          onLongPress={() => {
-            if (!selectionMode) {
-              setSelectionMode(true);
-              setSelectedTrashItems([item.id]);
+ <FlatList
+  key={flatListKey} // forces re-render when layout changes
+  data={trash}
+  keyExtractor={(item, index) => (item.id ? item.id.toString() : index.toString())}
+  numColumns={isGrid ? 2 : 1}
+  columnWrapperStyle={isGrid ? { justifyContent: 'space-between', marginBottom: 10, alignSelf:'center'} : null}
+  renderItem={({ item }) => {
+    const isSelected = selectedTrashItems.includes(item.id);
+    return (
+      <TouchableOpacity
+        style={[
+          styles.trashItem,
+          isGrid && { width: '55%' },
+          isSelected && {
+            marginLeft:0,
+            height:70,
+            maxWidth:150,
+            marginTop:10,
+            backgroundColor:'#ba7a7aff',
+            borderRadius:10,
+            padding:10
+          }
+        ]}
+        onLongPress={() => {
+          if (!selectionMode) {
+            setSelectionMode(true);
+            setSelectedTrashItems([item.id]);
+          }
+        }}
+        onPress={() => {
+          if (selectionMode) {
+            if (isSelected) {
+              setSelectedTrashItems(selectedTrashItems.filter(id => id !== item.id));
+            } else {
+              setSelectedTrashItems([...selectedTrashItems, item.id]);
             }
-          }}
-          onPress={() => {
-            if (selectionMode) {
-              if (isSelected) {
-                setSelectedTrashItems(selectedTrashItems.filter(id => id !== item.id));
-              } else {
-                setSelectedTrashItems([...selectedTrashItems, item.id]);
-              }
-            }
-          }}
-        >
-          <Text style={{ color: 'white' }}>{item.name} ({item.type})</Text>
-        </TouchableOpacity>
-      );
-    }}
-  />
+          }
+        }}
+      >
+        <Text style={{ color: 'white' }}>
+          {item.name || 'Unnamed'} ({item.type || 'unknown'})
+        </Text>
+      </TouchableOpacity>
+    );
+  }}
+/>
+
 </View>
 
      
@@ -1159,7 +1169,7 @@ const renderFile = ({ item }) => (
       </TouchableOpacity>
        <TouchableOpacity
         style={{
-        marginLeft:50,
+        marginLeft:40,
         marginTop:20
        }}>
         <Image 
@@ -1168,7 +1178,7 @@ const renderFile = ({ item }) => (
       </TouchableOpacity>
        <TouchableOpacity
         style={{
-        marginLeft:50,
+        marginLeft:40,
         marginTop:20
        }}>
         <Image 
@@ -1177,16 +1187,33 @@ const renderFile = ({ item }) => (
       </TouchableOpacity>
        <TouchableOpacity
         style={{
-        marginLeft:50,
+        marginLeft:40,
         marginTop:20
-       }}>
+       }}
+       onPress={() => showAlert(item)}>
         <Image 
         source={require('./assets/download.png')}
         style={{width:20,height:20}}/>
       </TouchableOpacity>
+       <TouchableOpacity
+       style={{
+        marginLeft:40,
+        marginTop:20
+       }}
+         onPress={() => {
+    if (selectedFile) {
+      handleDeleteFile2(selectedFile);  // directly delete the file
+      setfile(false);                  // close the modal toolbar if needed
+      setFileModalVisible(false);      // close the file preview modal
+    }
+  }}>
+        <Image 
+        source={require('./assets/delete.png')}
+        style={{width:20,height:20}}/>
+      </TouchableOpacity>
       <TouchableOpacity
        style={{
-        marginLeft:50,
+        marginLeft:40,
         marginTop:20
        }}>
         <Image 
