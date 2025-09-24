@@ -1,9 +1,17 @@
 # Safelocker  
 Your go-to app for storing and securing your files.
 
-![Safelocker Screenshot](https://github.com/user-attachments/assets/c2f1d57d-db7f-4705-b5ec-6694871b31e0)
-
----
+<picture>
+  <!-- show smaller image on big screens -->
+  <source media="(min-width: 1024px)" 
+          srcset="https://github.com/user-attachments/assets/c2f1d57d-db7f-4705-b5ec-6694871b31e0" 
+          width="50%">
+  <!-- default -->
+  <img 
+    src="https://github.com/user-attachments/assets/c2f1d57d-db7f-4705-b5ec-6694871b31e0"
+    alt="Safelocker Screenshot"
+    style="max-width:100%; height:auto; display:block; margin:0 auto;">
+</picture>
 
 ## ✨ Features
 
