@@ -128,8 +128,8 @@ const showAlert = (file) => {
     "Delete File",
     `Are you sure you want to delete "${file.name}"?`,
     [
-      { text: "Cancel", style: "cancel" },
-      { text: "Delete", style: "destructive", onPress: () => handleDeleteFile2(file) }
+      { text: t('Cancel'), style: "cancel" },
+      { text: t('Delete'), style: "destructive", onPress: () => handleDeleteFile2(file) }
     ],
     { cancelable: false }
   );
@@ -380,25 +380,42 @@ const renderFile = ({ item }) => (
       Cancel: 'Cancel',
       Rename: 'Rename',
       Save: 'Save',
+      Delete:'Delete',
+      Restore:'Restore',
       untitledfolder:'Untitled folder',
       EmptyFolder:'empty folder',
-      viewAll:'View all'
+      viewAll:'View all',
+      Settings:"Settings",
+      Apearence:'Apearence',
+      FileManagement:'File Managment',
+      Security:'Security & Privacy',
+      AboutApp:'About App',
+      Talktodevteam:'Contact developer team'
     },
-    fr: {
-      greeting: 'Bonjour',
-      darkMode: 'Mode sombre',
-      chooseLanguage: 'Choisir la langue',
-      recentactivity: 'Recent activity',
-      Myfiles: 'Mes fichiers',
-      Mypasswords: ' mots de passe',
-      Mytrashbean: 'Poubelle',
-      enterPin: settingPin ? 'Définir votre PIN' : 'Entrez le PIN',
-      Cancel: 'Annuler',
-      Rename: 'Renommer',
-      Save: 'Enregistrer',
-       EmptyFolder:'No files added yet',
-       viewAll:'View all'
-    },
+     fr: {
+    greeting: 'Bonjour',
+    darkMode: 'Mode sombre',
+    chooseLanguage: 'Choisir la langue',
+    recentactivity: 'Activité récente',
+    Myfiles: 'Mes fichiers',
+    Mypasswords: ' mots de passe',
+    Mytrashbean: 'Poubelle',
+    enterPin: settingPin ? 'Définir votre PIN' : 'Entrez le PIN',
+    Cancel: 'Annuler',
+    Rename: 'Renommer',
+    Save: 'Enregistrer',
+    Delete: 'Supprimer',
+    Restore: 'Restaurer',
+    untitledfolder: 'Dossier sans nom',
+    EmptyFolder: 'Dossier vide',
+    viewAll: 'Voir tout',
+    Settings: 'Paramètres',
+    Appearance: 'Apparence',
+    FileManagement: 'Gestion de fichiers',
+    Security: 'Sécurité et confidentialité',
+    AboutApp: "À propos de l'application",
+    Talktodevteam: 'Contacter l’équipe de développeurs',
+  },
     pt: {
       greeting: 'Olá',
       darkMode: 'Modo escuro',
@@ -411,9 +428,17 @@ const renderFile = ({ item }) => (
       Cancel: 'Cancelar',
       Rename: 'Renomear',
       Save: 'Salvar',
+      Delete:'Deletar',
+      Restore:'Restourar',
       untitledfolder:'pasta sem nome',
        EmptyFolder:'pasta vazia',
-       viewAll:'Ver tudo'
+       viewAll:'Ver tudo',
+      Settings:"Definições",
+      Apearence:'Aparencia',
+      FileManagement:'gestão de ficheiros',
+      Security:'Segurança & privacidade',
+      AboutApp:'Sobre o aplicativo',
+      Talktodevteam:'Contactar a equipe de densevolvedores'
     },
   };
 
@@ -732,53 +757,124 @@ const renderFile = ({ item }) => (
         onRequestClose={()=>setsettingsView(false)}>
           <View>
             <View style={{
-              
+              flexDirection:'row',
+              marginTop:20
             }}>
+             
    <Text style={{
               marginLeft:20,
               fontSize:25,
               fontWeight:'bold',
               marginTop:20
 
-            }}>Settings</Text>
+            }}>{t('Settings')}</Text>
 
+<TouchableOpacity style={{
+  marginLeft:170,
+  marginTop:25
+}}>
+  <Image 
+  source={require('./assets/letter.png')}
+  style={{
+    width:20,
+    height:20
+  }}/>
+</TouchableOpacity>
             </View>
          
             <View style={{
-              marginTop:200,
-              marginLeft:20
+              width:'100%',
+              marginTop:150,
+              alignSelf:'center',
+              
+              
             }}>
-                <Text style={{
+               <TouchableOpacity style={{
+                 width:'90%',
+                 backgroundColor:'darkgray',
+                borderRadius:10,
+                alignSelf:'center'
+                
+               }}>
+                 <Text style={{
             fontSize:20,
             fontWeight:'bold',
             marginLeft:40,
             padding:10
-           }}>Apearence</Text>
-           <Text style={{
+           }}>{t('Apearence')}</Text>
+              </TouchableOpacity>
+
+                <TouchableOpacity
+                style={{
+                 width:'90%',
+                 backgroundColor:'darkgray',
+                borderRadius:10,
+                marginTop:10,
+                alignSelf:'center'
+                
+               }}>
+                 <Text style={{
             fontSize:20,
             fontWeight:'bold',
             marginLeft:40,
             padding:10
-           }}>File managment</Text>
-            <Text style={{
+           }}>{t('FileManagement')}</Text>
+              </TouchableOpacity>
+
+               <TouchableOpacity
+               style={{
+                width:'90%',
+                 backgroundColor:'darkgray',
+                borderRadius:10,
+                marginTop:10,
+                alignSelf:'center'
+                
+               }}>
+                  <Text style={{
             fontSize:20,
             fontWeight:'bold',
             marginLeft:40,
              padding:10
-           }}>security & privacy</Text>
-            <Text style={{
+           }}>{t('Security')}</Text>
+              </TouchableOpacity>
+
+               <TouchableOpacity
+               style={{
+                 width:'90%',
+                 backgroundColor:'darkgray',
+                borderRadius:10,
+                marginTop:10,
+                alignSelf:'center'
+                
+               }}>
+                  <Text style={{
             fontSize:20,
             fontWeight:'bold',
             marginLeft:40,
              padding:10
-           }}>About app</Text>
-          <Text style={{
-            fontSize:20,
-            fontWeight:'bold',
-            marginLeft:40,
-             padding:10
-           }}>Contact developer team</Text>
+           }}>{t('AboutApp')}</Text>
+              </TouchableOpacity>
           
+           <TouchableOpacity
+           style={{
+                width:'90%',
+                 backgroundColor:'darkgray',
+                borderRadius:10,
+                marginTop:10,
+                alignSelf:'center'
+                
+               }}>
+                 <Text style={{
+            fontSize:20,
+            fontWeight:'bold',
+            marginLeft:40,
+             padding:10
+           }}>{t('Talktodevteam')}</Text>
+          
+              </TouchableOpacity>
+          
+          
+         
             </View>
        
           </View>
@@ -834,11 +930,11 @@ const renderFile = ({ item }) => (
         marginTop:20
       }}>
         <Text style={{ marginLeft: 20, fontSize: 20, fontWeight: 'bold' }}>
-          Trash
+         {t('Mytrashbean')}
         </Text>
         <TouchableOpacity
         style={{
-          marginLeft:250,
+          marginLeft:170,
           marginTop:5
         }}
        onPress={() => {
@@ -858,16 +954,16 @@ const renderFile = ({ item }) => (
     data={trash}
     keyExtractor={(item) => item.id.toString()}
     numColumns={isGrid ? 2 : 1}
-    columnWrapperStyle={isGrid ? { justifyContent: 'space-between', marginBottom: 10 } : null}
+    columnWrapperStyle={isGrid ? { justifyContent: 'space-between', marginBottom: 10 ,alignSelf:'center'} : null}
     renderItem={({ item }) => {
       const isSelected = selectedTrashItems.includes(item.id);
       return (
         <TouchableOpacity
           style={[
             styles.trashItem,
-            isGrid && { width: '48%' }, // only set width in grid mode
+            isGrid && { width: '55%' }, // only set width in grid mode
             isSelected && {
-                marginLeft:20,
+                marginLeft:0,
     height:70,
     maxWidth:150,
     marginTop:10,
@@ -909,12 +1005,12 @@ const renderFile = ({ item }) => (
               fontSize:20,
               fontWeight:'bold'
 
-            }}>Restore</Text>
+            }}>{t('Restore')}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={deletePermanently}>
             <Text style={{
               color:'red',fontSize:20,fontWeight:'bold'
-            }}>Delete</Text>
+            }}>{t('Delete')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -924,7 +1020,7 @@ const renderFile = ({ item }) => (
           >
             <Text style={{
               color:'white',fontSize:20,fontWeight:'bold',
-            }}>Cancel</Text>
+            }}>{t('Cancel')}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -949,7 +1045,7 @@ const renderFile = ({ item }) => (
          
           fontWeight:'bold',
           fontSize:20
-        }}>My Passswords</Text>
+        }}>{t('Mypasswords')}</Text>
          <TouchableOpacity style={{ marginTop: 5, marginLeft: 100 }} >
                     <Image
                       source={require('./assets/key3.png')}
