@@ -31,6 +31,8 @@ export default function App() {
   const [selectedFile, setSelectedFile] = useState(null);
    const [fileModalVisible, setFileModalVisible] = useState(false);
     const [trash, setTrash] = useState([]);
+
+    const [Pin,setPin]= useState(false);
 // selected items ids in trash
   const [selectedTrashItems, setSelectedTrashItems] = useState([]);
   const [selectionMode, setSelectionMode] = useState(false); 
@@ -246,6 +248,7 @@ useEffect(() => {
   };
 
   // Render each file in FlatList
+// Render each file in FlatList
 const renderFile = ({ item }) => (
   <TouchableOpacity
     style={styles.fileItem}
@@ -253,7 +256,8 @@ const renderFile = ({ item }) => (
       setSelectedFile(item);
       setFileModalVisible(true);
     }}
-    onLongPress={()=>setfile(true)}
+    // 👇 The crucial addition
+    onLongPress={() => showAlert(item)} 
   >
     <Text style={styles.fileText}>{item.name}</Text>
   </TouchableOpacity>
@@ -1120,13 +1124,8 @@ const renderFile = ({ item }) => (
           fontWeight:'bold',
           fontSize:20
         }}>{t('Mypasswords')}</Text>
-         <TouchableOpacity style={{ marginTop: 5, marginLeft: 100 }} >
-                    <Image
-                      source={require('./assets/key3.png')}
-                      style={{ width: 25, height: 25 }}
-                    />
-        </TouchableOpacity>
-        <TouchableOpacity style={{ marginTop: 5, marginLeft: 40 }} >
+         
+        <TouchableOpacity style={{ marginTop: 5, marginLeft: 150 }} >
                     <Image
                       source={require('./assets/wallet.png')}
                       style={{ width: 25, height: 25 }}
@@ -1141,7 +1140,62 @@ const renderFile = ({ item }) => (
         
       }}>
 
+        <TouchableOpacity>
+          <View style={{
+            width:'90%',
+            height:150,
+            backgroundColor:'lightgray',
+            alignSelf:'center',
+            borderRadius:20,
+            marginTop:50
+          }}>
+            <Text style={{
+              marginLeft:20,
+              marginTop:10,
+              fontSize:15,
+              fontWeight:'bold'
+            }}>App Acess Pin</Text>
+
+            <TextInput
+             placeholder='* * * *'
+             placeholderTextColor='red'
+             editable={false}
+             
+             style={{
+             width:150,
+             height:80,
+             borderRadius:10,
+             alignSelf:'center',
+             fontSize:50,
+             marginTop:20,
+             
+             
+             color:'red',fontWeight:'bold'}}/>
+             <TouchableOpacity
+             style={{
+              marginLeft:280,
+              marginTop:-65
+             }}>
+              <Image
+              source={require('./assets/view.png')}
+              style={{width:30,height:30}}
+              />
+             </TouchableOpacity>
+
+          </View>
+        </TouchableOpacity>
+
+
+ <TouchableOpacity style={styles.btnpassword} onPress={()=>setPin(true)}>
+        <Image
+        source={require('./assets/spanner.png')}
+        style={{
+          width:40,
+          height:40
+        }}/>
+      </TouchableOpacity>
       </View>
+     
     </View>
   </Modal>
 )}
@@ -1220,6 +1274,65 @@ const renderFile = ({ item }) => (
         source={require('./assets/share2.png')}
         style={{width:20,height:20}}/>
       </TouchableOpacity>
+
+    </View>
+  </Modal>
+)}
+
+{Pin&&(
+  <Modal
+  transparent
+  animationType='fade'
+  onRequestClose={()=>setPin(false)}>
+    <View style={{
+      width:'80%',
+      height:400,
+      backgroundColor:'gray',
+      alignSelf:'center',
+      marginTop:100,
+      borderRadius:20
+
+    }}>
+
+
+
+<View style={{
+  width:'60%',
+  alignSelf:'center',
+  height:150,
+  marginTop:100,
+  backgroundColor:'lightgray',
+  borderRadius:10,
+  padding:20
+}}>
+
+
+  <Text style={{
+    width:130,
+    height:40,
+    fontStyle:'italic',
+    fontSize:15,
+    alignSelf:'center'
+  }}>Current Password</Text>
+</View>
+      <Text style={{
+        fontSize:20,
+        fontWeight:"bold",
+        marginTop:20,
+        alignSelf:'center',
+        backgroundColor:'#3084a3ff',
+        padding:10,
+        borderRadius:10
+      }}>Set a new Password</Text>
+         <Text style={{
+        fontSize:20,
+        fontWeight:"bold",
+        marginTop:20,
+        alignSelf:'center',
+        backgroundColor:'#5d735dff',
+        padding:10,
+        borderRadius:10
+      }}>manage my Passwords</Text>
 
     </View>
   </Modal>
@@ -1440,5 +1553,11 @@ actionText: {
   fontStyle:'italic',
   backgroundColor:'red'
 },
+btnpassword:{
+ position:'absolute',
+ bottom:200,
+ right:50
+
+}
     
 });
