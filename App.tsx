@@ -9,11 +9,14 @@ import {
   Modal,
   FlatList,
   TextInput,
-  Alert
+  Alert,
+  Switch,
+  
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as DocumentPicker from 'expo-document-picker';
 import { Image as RNImage } from 'react-native';
+
 
 export default function App() {
   const [isDark, setIsDark] = useState(false);
@@ -31,6 +34,7 @@ export default function App() {
   const [selectedFile, setSelectedFile] = useState(null);
    const [fileModalVisible, setFileModalVisible] = useState(false);
     const [trash, setTrash] = useState([]);
+    const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
     const [Pin,setPin]= useState(false);
 // selected items ids in trash
@@ -65,6 +69,40 @@ export default function App() {
   const [faq,setFaq] = useState(false);
   const [ clearData,setClearData] = useState(false);
 
+  //apearence box
+  const [theme,setTheme]= useState(false);
+  const[font,setfont]= useState(false);
+ 
+ //File management  box
+  const [backup,setBackup]= useState(false);
+ 
+
+   //Security box
+  const [authentication,setAuthentication]= useState(false);
+  const[lockTimer,setLockTimer]= useState(false);
+
+   //About App box
+  const [policy,setPolic]= useState(false);
+ 
+   //apearence box
+ 
+  //Contanct Dev  box
+  
+
+   //Help box
+  const [helpsettingitem,setHelpsettingitem]= useState(false);
+  const[troubleshooting,setTroubleshooting]= useState(false);
+
+    //Clear Data  box
+  const [clearCache,setClearCache]= useState(false);
+  const[clearfilles,setClearFilles]= useState(false);
+
+
+ 
+ 
+ 
+ 
+ 
 
   // Load saved folders from AsyncStorage on mount
   useEffect(() => {
@@ -1371,48 +1409,54 @@ const renderFile = ({ item }) => (
         marginTop:20
       }}>Apearence</Text>
 
-<TouchableOpacity>
+<TouchableOpacity onPress={()=>setTheme(true)}>
       <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20,
-        height:40
+        marginTop:30,
+        height:25,
+        color:'white'
       }}>Theme</Text>
       <Image
       source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      style={{width:17,height:17,marginTop:-20,marginLeft:300}}
       />
 </TouchableOpacity>
 
-<TouchableOpacity>
+<TouchableOpacity onPress={()=>setfont(true)}>
      <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20
+        marginTop:30,
+        height:25,
+        color:'white'
       }}>Font & text size</Text>
       <Image
       source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      style={{width:17,height:17,marginTop:-20,marginLeft:300}}
       />
 
 </TouchableOpacity>
-<TouchableOpacity>
+
   <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20
-      }}>Animation toggle</Text>
-      <Image
-      source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+        marginTop:30,
+        height:25,
+        color:'white'
+      }}>Animation </Text>
+       <Switch
+     
+      style={{width:20,height:20,marginTop:-21,marginLeft:300}}
       />
-</TouchableOpacity>
+
+
    
       
       
@@ -1432,48 +1476,54 @@ const renderFile = ({ item }) => (
         marginTop:20
       }}>File Management</Text>
 
-<TouchableOpacity>
+
       <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20,
-        height:40
+        marginTop:30,
+        height:25,
+        color:'white'
       }}>Sort & filter preferences</Text>
-      <Image
-      source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      <Switch
+     
+      style={{width:20,height:20,marginTop:-23,marginLeft:300}}
       />
-</TouchableOpacity>
+
 
 <TouchableOpacity>
      <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20
+         marginTop:30,
+        height:25,
+        color:'white'
       }}>Backup & restore</Text>
       <Image
       source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      style={{width:17,height:17,marginTop:-20,marginLeft:300}}
       />
 
 </TouchableOpacity>
-<TouchableOpacity>
+
   <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20
+        marginTop:30,
+        height:25,
+        color:'white'
       }}>File auto-lock</Text>
-      <Image
-      source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      <Switch
+     
+      style={{width:20,height:20,marginTop:-23,marginLeft:300}}
       />
-</TouchableOpacity>
+
+
     </View>
   </Modal>
 )}
@@ -1485,53 +1535,58 @@ const renderFile = ({ item }) => (
     <View style={styles.modalboxview}>
        <Text style={{
         fontWeight:'bold',
-        fontSize:25,
+        fontSize:20,
         textAlign:'center',
         marginTop:20
-      }}>Security</Text>
+      }}>Security & Privacy</Text>
 
 <TouchableOpacity>
       <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20,
-        height:40
+        marginTop:30,
+        height:25,
+        color:'white'
       }}>Authentication type</Text>
       <Image
       source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      style={{width:17,height:17,marginTop:-20,marginLeft:300}}
       />
 </TouchableOpacity>
 
-<TouchableOpacity>
+
      <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20
+         marginTop:30,
+        height:25,
+        color:'white'
       }}>Auto-lock timer</Text>
-      <Image
-      source={require('./assets/next.png')}
+      <Switch
+     
       style={{width:20,height:20,marginTop:-25,marginLeft:300}}
       />
 
-</TouchableOpacity>
-<TouchableOpacity>
+
+
   <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20
+         marginTop:30,
+        height:25,
+        color:'white'
       }}>Two-step unlock</Text>
-      <Image
-      source={require('./assets/next.png')}
+      <Switch
+     
       style={{width:20,height:20,marginTop:-25,marginLeft:300}}
       />
-</TouchableOpacity>
+
     </View>
   </Modal>
 )}
@@ -1546,21 +1601,23 @@ const renderFile = ({ item }) => (
         fontWeight:'bold',
         fontSize:25,
         textAlign:'center',
-        marginTop:20
-      }}> App version</Text>
+       marginTop:30,
+        
+      }}>About App</Text>
 
 <TouchableOpacity>
       <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20,
-        height:40
+        marginTop:30,
+        height:25,
+        color:'white'
       }}>App version</Text>
       <Image
       source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      style={{width:17,height:17,marginTop:-20,marginLeft:300}}
       />
 </TouchableOpacity>
 
@@ -1568,13 +1625,15 @@ const renderFile = ({ item }) => (
      <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20
+         marginTop:30,
+        height:25,
+        color:'white'
       }}>Developer info</Text>
       <Image
       source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      style={{width:17,height:17,marginTop:-20,marginLeft:300}}
       />
 
 </TouchableOpacity>
@@ -1582,13 +1641,15 @@ const renderFile = ({ item }) => (
   <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20
+        marginTop:30,
+        height:25,
+        color:'white'
       }}>Privacy policy</Text>
       <Image
       source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      style={{width:17,height:17,marginTop:-20,marginLeft:300}}
       />
 </TouchableOpacity>
     </View>
@@ -1604,21 +1665,23 @@ const renderFile = ({ item }) => (
         fontWeight:'bold',
         fontSize:25,
         textAlign:'center',
-        marginTop:20
+         marginTop:30,
+      
       }}>Contact Dev Team</Text>
 
 <TouchableOpacity>
       <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20,
-        height:40
+         marginTop:30,
+        height:25,
+        color:'white'
       }}>Contact form</Text>
       <Image
       source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      style={{width:17,height:17,marginTop:-20,marginLeft:300}}
       />
 </TouchableOpacity>
 
@@ -1626,13 +1689,15 @@ const renderFile = ({ item }) => (
      <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20
+       marginTop:30,
+        height:25,
+        color:'white'
       }}>Support email</Text>
       <Image
       source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      style={{width:17,height:17,marginTop:-20,marginLeft:300}}
       />
 
 </TouchableOpacity>
@@ -1640,13 +1705,15 @@ const renderFile = ({ item }) => (
   <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20
+        marginTop:30,
+        height:25,
+        color:'white'
       }}>Socials / community</Text>
       <Image
       source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      style={{width:17,height:17,marginTop:-20,marginLeft:300}}
       />
 </TouchableOpacity>
     </View>
@@ -1663,20 +1730,21 @@ const renderFile = ({ item }) => (
         fontSize:25,
         textAlign:'center',
         marginTop:20
-      }}>Contact Dev Team</Text>
+      }}>Help</Text>
 
 <TouchableOpacity>
       <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20,
-        height:40
+         marginTop:30,
+        height:25,
+        color:'white'
       }}>Quick start guide</Text>
       <Image
       source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      style={{width:17,height:17,marginTop:-20,marginLeft:300}}
       />
 </TouchableOpacity>
 
@@ -1684,13 +1752,15 @@ const renderFile = ({ item }) => (
      <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20
+         marginTop:30,
+        height:25,
+        color:'white'
       }}>Troubleshooting</Text>
       <Image
       source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      style={{width:17,height:17,marginTop:-20,marginLeft:300}}
       />
 
 </TouchableOpacity>
@@ -1710,20 +1780,21 @@ const renderFile = ({ item }) => (
         fontSize:25,
         textAlign:'center',
         marginTop:20
-      }}>Contact Dev Team</Text>
+      }}>FAQ</Text>
 
 <TouchableOpacity>
       <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20,
-        height:40
+        marginTop:30,
+        height:25,
+        color:'white'
       }}>Quick start guide</Text>
       <Image
       source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      style={{width:17,height:17,marginTop:-20,marginLeft:300}}
       />
 </TouchableOpacity>
     </View>
@@ -1740,20 +1811,21 @@ const renderFile = ({ item }) => (
         fontSize:25,
         textAlign:'center',
         marginTop:20
-      }}>File Management</Text>
+      }}>Clear Data</Text>
 
 <TouchableOpacity>
       <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20,
-        height:40
+        marginTop:30,
+        height:25,
+        color:'white'
       }}>Clear cache</Text>
       <Image
       source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      style={{width:17,height:17,marginTop:-20,marginLeft:300}}
       />
 </TouchableOpacity>
 
@@ -1761,13 +1833,15 @@ const renderFile = ({ item }) => (
      <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20
+        marginTop:30,
+        height:25,
+        color:'white'
       }}>Clear all files</Text>
       <Image
       source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      style={{width:17,height:17,marginTop:-20,marginLeft:300}}
       />
 
 </TouchableOpacity>
@@ -1775,19 +1849,230 @@ const renderFile = ({ item }) => (
   <Text
       style={{
         
-        fontSize:25,
+        fontSize:20,
         marginLeft:50,
-        marginTop:20
+         marginTop:30,
+        height:25,
+        color:'white'
       }}>Reset settings</Text>
       <Image
       source={require('./assets/next.png')}
-      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      style={{width:17,height:17,marginTop:-20,marginLeft:300}}
       />
 </TouchableOpacity>
     </View>
   </Modal>
 )}
+{theme&&(
+  <Modal
+  transparent
+  onRequestClose={()=>setTheme(false)}>
+    <View style={{
+      width:300,
+      height:200,
+      backgroundColor:'#dee7c1ff',
+      alignSelf:'center',
+      marginTop:210,
+      borderRadius:5
+    }}>
 
+      <Text style={{
+        marginLeft:50,
+        fontWeight:'bold',
+        fontSize:20,
+        marginTop:20
+      }}>night mode </Text>
+       <Switch style={{
+        marginTop:-40,
+        marginRight:20
+      }} />
+      
+     
+      <Text
+       style={{
+        marginLeft:50,
+        fontWeight:'bold',
+        fontSize:20,
+         marginTop:20,
+        
+      }}>contrast color </Text>
+      <Switch style={{
+        marginTop:-40,
+         marginRight:20
+      }} />
+
+
+
+
+    </View>
+
+  </Modal>
+)}
+
+{font&&(
+  <Modal
+  transparent
+  onRequestClose={()=>setfont(false)}>
+  <View style={{
+      width:300,
+      height:200,
+      backgroundColor:'#dee7c1ff',
+      alignSelf:'center',
+      marginTop:210,
+      borderRadius:5
+    }}>
+
+      <Text style={{
+        marginLeft:50,
+        fontWeight:'bold',
+        fontSize:20,
+        marginTop:20
+      }}>night mode </Text>
+       <Switch style={{
+        marginTop:-40,
+        marginRight:20
+      }} />
+      
+     
+      <Text
+       style={{
+        marginLeft:50,
+        fontWeight:'bold',
+        fontSize:20,
+         marginTop:20,
+        
+      }}>contrast color </Text>
+      <Switch style={{
+        marginTop:-40,
+         marginRight:20
+      }} />
+
+
+
+
+    </View>
+  </Modal>
+)}
+
+
+{backup&&(
+  <Modal
+  transparent
+  onRequestClose={()=>setBackup(false)}>
+  <View style={{
+      width:300,
+      height:200,
+      backgroundColor:'#dee7c1ff',
+      alignSelf:'center',
+      marginTop:210,
+      borderRadius:5
+    }}>
+
+      <Text style={{
+        marginLeft:50,
+        fontWeight:'bold',
+        fontSize:20,
+        marginTop:20
+      }}>night mode </Text>
+       <Switch style={{
+        marginTop:-40,
+        marginRight:20
+      }} />
+      
+     
+      <Text
+       style={{
+        marginLeft:50,
+        fontWeight:'bold',
+        fontSize:20,
+         marginTop:20,
+        
+      }}>contrast color </Text>
+      <Switch style={{
+        marginTop:-40,
+         marginRight:20
+      }} />
+
+
+
+
+    </View>
+  </Modal>
+)}
+
+{authentication&&(
+  <Modal
+  transparent
+  onRequestClose={()=>setAuthentication(false)}>
+ <View style={{
+      width:300,
+      height:200,
+      backgroundColor:'#dee7c1ff',
+      alignSelf:'center',
+      marginTop:210,
+      borderRadius:5
+    }}>
+
+      <Text style={{
+        marginLeft:50,
+        fontWeight:'bold',
+        fontSize:20,
+        marginTop:20
+      }}>night mode </Text>
+      
+     
+      <Text
+       style={{
+        marginLeft:50,
+        fontWeight:'bold',
+        fontSize:20,
+         marginTop:20
+        
+      }}>contrast color </Text>
+
+
+
+
+    </View>
+  </Modal>
+)}
+
+{lockTimer&&(
+  <Modal
+  transparent
+  onRequestClose={()=>setLockTimer(false)}>
+ <View style={{
+      width:300,
+      height:200,
+      backgroundColor:'#dee7c1ff',
+      alignSelf:'center',
+      marginTop:210,
+      borderRadius:5
+    }}>
+
+      <Text style={{
+        marginLeft:50,
+        fontWeight:'bold',
+        fontSize:20,
+        marginTop:20
+      }}>night mode </Text>
+      
+     
+      <Text
+       style={{
+        marginLeft:50,
+        fontWeight:'bold',
+        fontSize:20,
+         marginTop:20
+        
+      }}>contrast color </Text>
+
+
+
+
+    </View>
+  </Modal>
+)}
     </View>
   );
 }
