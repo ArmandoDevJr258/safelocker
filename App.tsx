@@ -34,7 +34,8 @@ export default function App() {
   const [selectedFile, setSelectedFile] = useState(null);
    const [fileModalVisible, setFileModalVisible] = useState(false);
     const [trash, setTrash] = useState([]);
-    const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+    const[toglehide,setToggleHide] = useState(true);
+    
 
     const [Pin,setPin]= useState(false);
 // selected items ids in trash
@@ -583,7 +584,7 @@ const renderFile = ({ item }) => (
           <Image source={getFlagSource()} style={{ width: 20, height: 20 }} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.btnsettings} onPress={()=>setsettingsView(true)}>
-          <Image source={require('./assets/settings.png')} style={{ width: 20, height: 20 ,tintColor:'white'}} />
+          <Image source={require('./assets/settings.png')} style={{ width: 20, height: 20 ,tintColor:'black'}} />
         </TouchableOpacity>
       </View>
 
@@ -710,7 +711,7 @@ const renderFile = ({ item }) => (
 
       {myFiles && (
         <Modal onRequestClose={() => setmyFiles(false)}>
-          <View style={styles.FilesView}>
+          <View style={[styles.FilesView, isDark ? styles.dark : styles.light]}>
             {header && (<View style={styles.filesheader}>
               <Text style={{ marginLeft: 20, fontSize: 20, fontWeight: 'bold', color: 'white' }}>{t('Myfiles')}</Text>
               <TouchableOpacity style={styles.btnnewfolder} onPress={addNewFolder}>
@@ -789,7 +790,7 @@ const renderFile = ({ item }) => (
                     style={isGridView ? styles.folderGridItem : styles.folderItem}
                   >
                     <View>
-                      <Text style={{ textAlign: 'center' }}>{item.name}</Text>
+                      <Text style={{ textAlign: 'center' ,color:'#FFD580'}}>{item.name}</Text>
                     </View>
                   </TouchableOpacity>
                 )}
@@ -808,7 +809,7 @@ const renderFile = ({ item }) => (
               data={selectedFolder?.files || []}
               keyExtractor={(item) => item.id}
               renderItem={renderFile}
-              ListEmptyComponent={<Text style={{fontStyle:'italic'}}>{t('EmptyFolder')}</Text>}
+              ListEmptyComponent={<Text style={{fontStyle:'italic',color:'#FFD580'}}>{t('EmptyFolder')}</Text>}
               style={{marginLeft:10}}
             />
             <TouchableOpacity style={styles.btnadd} onPress={pickFile}>
@@ -825,17 +826,18 @@ const renderFile = ({ item }) => (
       {setttingsView&&(
         <Modal
         onRequestClose={()=>setsettingsView(false)}>
-          <View>
+          <View style={[styles.container, isDark ? styles.dark : styles.light]}>
             <View style={{
               flexDirection:'row',
-              marginTop:20
+             
             }}>
              
    <Text style={{
               marginLeft:20,
               fontSize:25,
               fontWeight:'bold',
-              marginTop:20
+              marginTop:20,
+              color:'orange'
 
             }}>{t('Settings')}</Text>
 
@@ -852,9 +854,11 @@ const renderFile = ({ item }) => (
 </TouchableOpacity>
             </View>
          
-            <View style={{
+         {toglehide&&(
+          
+          <View style={{
               width:'100%',
-              marginTop:150,
+              marginTop:30,
               alignSelf:'center',
               
               
@@ -871,7 +875,8 @@ const renderFile = ({ item }) => (
             fontSize:20,
             fontWeight:'bold',
             marginLeft:40,
-            padding:10
+            padding:10,
+            color:'#FFD580'
            }}>{t('Apearence')}</Text>
               </TouchableOpacity>
 
@@ -889,7 +894,8 @@ const renderFile = ({ item }) => (
             fontSize:20,
             fontWeight:'bold',
             marginLeft:40,
-            padding:10
+            padding:10,
+             color:'#FFD580'
            }}>{t('FileManagement')}</Text>
               </TouchableOpacity>
 
@@ -907,7 +913,8 @@ const renderFile = ({ item }) => (
             fontSize:20,
             fontWeight:'bold',
             marginLeft:40,
-             padding:10
+             padding:10,
+              color:'#FFD580'
            }}>{t('Security')}</Text>
               </TouchableOpacity>
 
@@ -925,7 +932,8 @@ const renderFile = ({ item }) => (
             fontSize:20,
             fontWeight:'bold',
             marginLeft:40,
-             padding:10
+             padding:10,
+              color:'#FFD580'
            }}>{t('AboutApp')}</Text>
               </TouchableOpacity>
           
@@ -943,7 +951,8 @@ const renderFile = ({ item }) => (
             fontSize:20,
             fontWeight:'bold',
             marginLeft:40,
-             padding:10
+             padding:10,
+              color:'#FFD580'
            }}>{t('Talktodevteam')}</Text>
           
               </TouchableOpacity>
@@ -961,7 +970,8 @@ const renderFile = ({ item }) => (
             fontSize:20,
             fontWeight:'bold',
             marginLeft:40,
-             padding:10
+             padding:10,
+              color:'#FFD580'
            }}>{t('Help')}</Text>
           
               </TouchableOpacity>
@@ -980,7 +990,8 @@ const renderFile = ({ item }) => (
             fontSize:20,
             fontWeight:'bold',
             marginLeft:40,
-             padding:10
+             padding:10,
+              color:'#FFD580'
            }}>{t('FAQ')}</Text>
           
               </TouchableOpacity>
@@ -999,7 +1010,8 @@ const renderFile = ({ item }) => (
             fontSize:20,
             fontWeight:'bold',
             marginLeft:40,
-             padding:10
+             padding:10,
+              color:'#FFD580'
            }}>{t('Erase')}</Text>
           
               </TouchableOpacity>
@@ -1009,6 +1021,8 @@ const renderFile = ({ item }) => (
           
          
             </View>
+         )}
+            
        
           </View>
 
@@ -1081,7 +1095,7 @@ const renderFile = ({ item }) => (
           />
         </TouchableOpacity>
       </View>
-<View style={styles.maintrashcontainer}>
+<View style={[styles.maintrashcontainer, isDark ? styles.dark : styles.light]}>
  <FlatList
   key={flatListKey} // forces re-render when layout changes
   data={trash}
@@ -1168,7 +1182,7 @@ const renderFile = ({ item }) => (
 
 {myPasswords&&(
   <Modal onRequestClose={()=>setmyPasswords(false)}>
-    <View>
+    <View style={[styles.container, isDark ? styles.dark : styles.light]}>
       <View style={{
         width:'100%',
         height:30,
@@ -1406,7 +1420,8 @@ const renderFile = ({ item }) => (
         fontWeight:'bold',
         fontSize:25,
         textAlign:'center',
-        marginTop:20
+        marginTop:20,
+         color:'#FFD580'
       }}>Apearence</Text>
 
 <TouchableOpacity onPress={()=>setTheme(true)}>
@@ -1473,7 +1488,8 @@ const renderFile = ({ item }) => (
         fontWeight:'bold',
         fontSize:25,
         textAlign:'center',
-        marginTop:20
+        marginTop:20,
+         color:'#FFD580'
       }}>File Management</Text>
 
 
@@ -1492,7 +1508,7 @@ const renderFile = ({ item }) => (
       />
 
 
-<TouchableOpacity>
+<TouchableOpacity onPress={()=>setTheme(true)}>
      <Text
       style={{
         
@@ -1537,10 +1553,11 @@ const renderFile = ({ item }) => (
         fontWeight:'bold',
         fontSize:20,
         textAlign:'center',
-        marginTop:20
+        marginTop:20,
+         color:'#FFD580'
       }}>Security & Privacy</Text>
 
-<TouchableOpacity>
+<TouchableOpacity onPress={()=>setTheme(true)}>
       <Text
       style={{
         
@@ -1602,10 +1619,11 @@ const renderFile = ({ item }) => (
         fontSize:25,
         textAlign:'center',
        marginTop:30,
+       color:'#FFD580'
         
       }}>About App</Text>
 
-<TouchableOpacity>
+<TouchableOpacity onPress={()=>setTheme(true)}>
       <Text
       style={{
         
@@ -1621,7 +1639,7 @@ const renderFile = ({ item }) => (
       />
 </TouchableOpacity>
 
-<TouchableOpacity>
+<TouchableOpacity onPress={()=>setTheme(true)}>
      <Text
       style={{
         
@@ -1637,7 +1655,7 @@ const renderFile = ({ item }) => (
       />
 
 </TouchableOpacity>
-<TouchableOpacity>
+<TouchableOpacity onPress={()=>setTheme(true)}>
   <Text
       style={{
         
@@ -1666,6 +1684,7 @@ const renderFile = ({ item }) => (
         fontSize:25,
         textAlign:'center',
          marginTop:30,
+         color:'#FFD580'
       
       }}>Contact Dev Team</Text>
 
@@ -1729,10 +1748,11 @@ const renderFile = ({ item }) => (
         fontWeight:'bold',
         fontSize:25,
         textAlign:'center',
-        marginTop:20
+        marginTop:20,
+         color:'#FFD580'
       }}>Help</Text>
 
-<TouchableOpacity>
+<TouchableOpacity onPress={()=>setTheme(true)}>
       <Text
       style={{
         
@@ -1748,7 +1768,7 @@ const renderFile = ({ item }) => (
       />
 </TouchableOpacity>
 
-<TouchableOpacity>
+<TouchableOpacity onPress={()=>setTheme(true)}>
      <Text
       style={{
         
@@ -1779,7 +1799,8 @@ const renderFile = ({ item }) => (
         fontWeight:'bold',
         fontSize:25,
         textAlign:'center',
-        marginTop:20
+        marginTop:20,
+         color:'#FFD580'
       }}>FAQ</Text>
 
 <TouchableOpacity>
@@ -1810,8 +1831,9 @@ const renderFile = ({ item }) => (
         fontWeight:'bold',
         fontSize:25,
         textAlign:'center',
-        marginTop:20
-      }}>Clear Data</Text>
+        marginTop:20,
+         color:'#FFD580'
+      }}>Clear App Data</Text>
 
 <TouchableOpacity>
       <Text
@@ -1868,14 +1890,25 @@ const renderFile = ({ item }) => (
   transparent
   onRequestClose={()=>setTheme(false)}>
     <View style={{
-      width:300,
-      height:200,
+      width:350,
+      height:170,
       backgroundColor:'#dee7c1ff',
       alignSelf:'center',
-      marginTop:210,
-      borderRadius:5
+      marginTop:200,
+      borderRadius:10
     }}>
+<TouchableOpacity onPress={()=>setTheme(false)}>
+  <Image 
+  source={require('./assets/back.png')}
+  style={{
+    width:17,
+    height:17,
+    marginTop:20,
+    marginLeft:15
 
+  }}
+  />
+</TouchableOpacity>
       <Text style={{
         marginLeft:50,
         fontWeight:'bold',
@@ -1914,14 +1947,25 @@ const renderFile = ({ item }) => (
   transparent
   onRequestClose={()=>setfont(false)}>
   <View style={{
-      width:300,
-      height:200,
+      width:350,
+      height:170,
       backgroundColor:'#dee7c1ff',
       alignSelf:'center',
-      marginTop:210,
-      borderRadius:5
+      marginTop:200,
+      borderRadius:10
     }}>
+<TouchableOpacity onPress={()=>setfont(false)}>
+  <Image 
+  source={require('./assets/back.png')}
+  style={{
+    width:17,
+    height:17,
+    marginTop:20,
+    marginLeft:15
 
+  }}
+  />
+</TouchableOpacity>
       <Text style={{
         marginLeft:50,
         fontWeight:'bold',
@@ -1960,14 +2004,25 @@ const renderFile = ({ item }) => (
   transparent
   onRequestClose={()=>setBackup(false)}>
   <View style={{
-      width:300,
-      height:200,
+      width:350,
+      height:170,
       backgroundColor:'#dee7c1ff',
       alignSelf:'center',
-      marginTop:210,
-      borderRadius:5
+      marginTop:200,
+      borderRadius:10
     }}>
+<TouchableOpacity onPress={()=>setTheme(false)}>
+  <Image 
+  source={require('./assets/back.png')}
+  style={{
+    width:17,
+    height:17,
+    marginTop:20,
+    marginLeft:15
 
+  }}
+  />
+</TouchableOpacity>
       <Text style={{
         marginLeft:50,
         fontWeight:'bold',
@@ -2005,20 +2060,35 @@ const renderFile = ({ item }) => (
   transparent
   onRequestClose={()=>setAuthentication(false)}>
  <View style={{
-      width:300,
-      height:200,
+      width:350,
+      height:170,
       backgroundColor:'#dee7c1ff',
       alignSelf:'center',
-      marginTop:210,
-      borderRadius:5
+      marginTop:200,
+      borderRadius:10
     }}>
+<TouchableOpacity onPress={()=>setTheme(false)}>
+  <Image 
+  source={require('./assets/back.png')}
+  style={{
+    width:17,
+    height:17,
+    marginTop:20,
+    marginLeft:15
 
+  }}
+  />
+</TouchableOpacity>
       <Text style={{
         marginLeft:50,
         fontWeight:'bold',
         fontSize:20,
         marginTop:20
       }}>night mode </Text>
+       <Switch style={{
+        marginTop:-40,
+        marginRight:20
+      }} />
       
      
       <Text
@@ -2026,9 +2096,13 @@ const renderFile = ({ item }) => (
         marginLeft:50,
         fontWeight:'bold',
         fontSize:20,
-         marginTop:20
+         marginTop:20,
         
       }}>contrast color </Text>
+      <Switch style={{
+        marginTop:-40,
+         marginRight:20
+      }} />
 
 
 
@@ -2042,20 +2116,35 @@ const renderFile = ({ item }) => (
   transparent
   onRequestClose={()=>setLockTimer(false)}>
  <View style={{
-      width:300,
-      height:200,
+      width:350,
+      height:170,
       backgroundColor:'#dee7c1ff',
       alignSelf:'center',
-      marginTop:210,
-      borderRadius:5
+      marginTop:200,
+      borderRadius:10
     }}>
+<TouchableOpacity onPress={()=>setTheme(false)}>
+  <Image 
+  source={require('./assets/back.png')}
+  style={{
+    width:17,
+    height:17,
+    marginTop:20,
+    marginLeft:15
 
+  }}
+  />
+</TouchableOpacity>
       <Text style={{
         marginLeft:50,
         fontWeight:'bold',
         fontSize:20,
         marginTop:20
       }}>night mode </Text>
+       <Switch style={{
+        marginTop:-40,
+        marginRight:20
+      }} />
       
      
       <Text
@@ -2063,9 +2152,13 @@ const renderFile = ({ item }) => (
         marginLeft:50,
         fontWeight:'bold',
         fontSize:20,
-         marginTop:20
+         marginTop:20,
         
       }}>contrast color </Text>
+      <Switch style={{
+        marginTop:-40,
+         marginRight:20
+      }} />
 
 
 
