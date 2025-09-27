@@ -54,6 +54,18 @@ export default function App() {
   const [setttingsView,setsettingsView]= useState(false);
   const [trashView,settrashView]= useState(false);
 
+  //Settings
+
+  const [apearence,setApearence] = useState(false);
+  const [fileManagament,setFileManagement] = useState(false);
+  const [security,setSecurity]= useState(false);
+  const [aboutApp,setAboutApp]= useState(false);
+  const [contactDev,setContactDev]= useState(false);
+  const [help,setHelp] = useState(false);
+  const [faq,setFaq] = useState(false);
+  const [ clearData,setClearData] = useState(false);
+
+
   // Load saved folders from AsyncStorage on mount
   useEffect(() => {
     const loadFolders = async () => {
@@ -815,7 +827,8 @@ const renderFile = ({ item }) => (
                 borderRadius:10,
                 alignSelf:'center'
                 
-               }}>
+               }}
+               onPress={()=>setApearence(true)}>
                  <Text style={{
             fontSize:20,
             fontWeight:'bold',
@@ -832,7 +845,8 @@ const renderFile = ({ item }) => (
                 marginTop:10,
                 alignSelf:'center'
                 
-               }}>
+               }}
+               onPress={()=>setFileManagement(true)}>
                  <Text style={{
             fontSize:20,
             fontWeight:'bold',
@@ -849,7 +863,8 @@ const renderFile = ({ item }) => (
                 marginTop:10,
                 alignSelf:'center'
                 
-               }}>
+               }}
+               onPress={()=>setSecurity(true)}>
                   <Text style={{
             fontSize:20,
             fontWeight:'bold',
@@ -866,7 +881,8 @@ const renderFile = ({ item }) => (
                 marginTop:10,
                 alignSelf:'center'
                 
-               }}>
+               }}
+               onPress={()=>setAboutApp(true)}>
                   <Text style={{
             fontSize:20,
             fontWeight:'bold',
@@ -883,7 +899,8 @@ const renderFile = ({ item }) => (
                 marginTop:10,
                 alignSelf:'center'
                 
-               }}>
+               }}
+               onPress={()=>setContactDev(true)}>
                  <Text style={{
             fontSize:20,
             fontWeight:'bold',
@@ -900,7 +917,8 @@ const renderFile = ({ item }) => (
                 marginTop:10,
                 alignSelf:'center'
                 
-               }}>
+               }}
+               onPress={()=>setHelp(true)}>
                  <Text style={{
             fontSize:20,
             fontWeight:'bold',
@@ -918,7 +936,8 @@ const renderFile = ({ item }) => (
                 marginTop:10,
                 alignSelf:'center'
                 
-               }}>
+               }}
+               onPress={()=>setFaq(true)}>
                  <Text style={{
             fontSize:20,
             fontWeight:'bold',
@@ -936,7 +955,8 @@ const renderFile = ({ item }) => (
                 marginTop:10,
                 alignSelf:'center'
                 
-               }}>
+               }}
+               onPress={()=>setClearData(true)}>
                  <Text style={{
             fontSize:20,
             fontWeight:'bold',
@@ -1337,6 +1357,437 @@ const renderFile = ({ item }) => (
     </View>
   </Modal>
 )}
+
+//my settings boxes
+{apearence&&(
+  <Modal
+  onRequestClose={()=>setApearence(false)}
+  transparent>
+    <View style={styles.modalboxview}>
+      <Text style={{
+        fontWeight:'bold',
+        fontSize:25,
+        textAlign:'center',
+        marginTop:20
+      }}>Apearence</Text>
+
+<TouchableOpacity>
+      <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20,
+        height:40
+      }}>Theme</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+</TouchableOpacity>
+
+<TouchableOpacity>
+     <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20
+      }}>Font & text size</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+
+</TouchableOpacity>
+<TouchableOpacity>
+  <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20
+      }}>Animation toggle</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+</TouchableOpacity>
+   
+      
+      
+    </View>
+  </Modal>
+)}
+
+{fileManagament&&(
+  <Modal
+  transparent
+   onRequestClose={()=>setFileManagement(false)}>
+    <View style={styles.modalboxview}>
+       <Text style={{
+        fontWeight:'bold',
+        fontSize:25,
+        textAlign:'center',
+        marginTop:20
+      }}>File Management</Text>
+
+<TouchableOpacity>
+      <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20,
+        height:40
+      }}>Sort & filter preferences</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+</TouchableOpacity>
+
+<TouchableOpacity>
+     <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20
+      }}>Backup & restore</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+
+</TouchableOpacity>
+<TouchableOpacity>
+  <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20
+      }}>File auto-lock</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+</TouchableOpacity>
+    </View>
+  </Modal>
+)}
+
+{security&&(
+  <Modal
+  transparent
+   onRequestClose={()=>setSecurity(false)}>
+    <View style={styles.modalboxview}>
+       <Text style={{
+        fontWeight:'bold',
+        fontSize:25,
+        textAlign:'center',
+        marginTop:20
+      }}>Security</Text>
+
+<TouchableOpacity>
+      <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20,
+        height:40
+      }}>Authentication type</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+</TouchableOpacity>
+
+<TouchableOpacity>
+     <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20
+      }}>Auto-lock timer</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+
+</TouchableOpacity>
+<TouchableOpacity>
+  <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20
+      }}>Two-step unlock</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+</TouchableOpacity>
+    </View>
+  </Modal>
+)}
+
+
+{aboutApp&&(
+  <Modal
+  transparent
+   onRequestClose={()=>setAboutApp(false)}>
+    <View style={styles.modalboxview}>
+  <Text style={{
+        fontWeight:'bold',
+        fontSize:25,
+        textAlign:'center',
+        marginTop:20
+      }}> App version</Text>
+
+<TouchableOpacity>
+      <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20,
+        height:40
+      }}>App version</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+</TouchableOpacity>
+
+<TouchableOpacity>
+     <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20
+      }}>Developer info</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+
+</TouchableOpacity>
+<TouchableOpacity>
+  <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20
+      }}>Privacy policy</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+</TouchableOpacity>
+    </View>
+  </Modal>
+)}
+
+{contactDev&&(
+  <Modal
+  transparent
+   onRequestClose={()=>setContactDev(false)}>
+    <View style={styles.modalboxview}>
+<Text style={{
+        fontWeight:'bold',
+        fontSize:25,
+        textAlign:'center',
+        marginTop:20
+      }}>Contact Dev Team</Text>
+
+<TouchableOpacity>
+      <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20,
+        height:40
+      }}>Contact form</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+</TouchableOpacity>
+
+<TouchableOpacity>
+     <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20
+      }}>Support email</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+
+</TouchableOpacity>
+<TouchableOpacity>
+  <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20
+      }}>Socials / community</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+</TouchableOpacity>
+    </View>
+  </Modal>
+)}
+
+{help&&(
+  <Modal
+  transparent
+   onRequestClose={()=>setHelp(false)}>
+    <View style={styles.modalboxview}>
+ <Text style={{
+        fontWeight:'bold',
+        fontSize:25,
+        textAlign:'center',
+        marginTop:20
+      }}>Contact Dev Team</Text>
+
+<TouchableOpacity>
+      <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20,
+        height:40
+      }}>Quick start guide</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+</TouchableOpacity>
+
+<TouchableOpacity>
+     <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20
+      }}>Troubleshooting</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+
+</TouchableOpacity>
+
+    </View>
+  </Modal>
+)}
+
+
+{faq&&(
+  <Modal
+  transparent
+   onRequestClose={()=>setFaq(false)}>
+    <View style={styles.modalboxview}>
+  <Text style={{
+        fontWeight:'bold',
+        fontSize:25,
+        textAlign:'center',
+        marginTop:20
+      }}>Contact Dev Team</Text>
+
+<TouchableOpacity>
+      <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20,
+        height:40
+      }}>Quick start guide</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+</TouchableOpacity>
+    </View>
+  </Modal>
+)}
+
+{clearData&&(
+  <Modal
+  transparent
+   onRequestClose={()=>setClearData(false)}>
+    <View style={styles.modalboxview}>
+ <Text style={{
+        fontWeight:'bold',
+        fontSize:25,
+        textAlign:'center',
+        marginTop:20
+      }}>File Management</Text>
+
+<TouchableOpacity>
+      <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20,
+        height:40
+      }}>Clear cache</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+</TouchableOpacity>
+
+<TouchableOpacity>
+     <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20
+      }}>Clear all files</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+
+</TouchableOpacity>
+<TouchableOpacity>
+  <Text
+      style={{
+        
+        fontSize:25,
+        marginLeft:50,
+        marginTop:20
+      }}>Reset settings</Text>
+      <Image
+      source={require('./assets/next.png')}
+      style={{width:20,height:20,marginTop:-25,marginLeft:300}}
+      />
+</TouchableOpacity>
+    </View>
+  </Modal>
+)}
+
     </View>
   );
 }
@@ -1558,6 +2009,14 @@ btnpassword:{
  bottom:200,
  right:50
 
+},
+modalboxview:{
+  width:'90%',
+  height:500,
+  backgroundColor:'darkgray',
+  alignSelf:'center',
+  marginTop:200,
+  borderRadius:15
 }
     
 });
