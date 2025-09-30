@@ -35,6 +35,9 @@ export default function App() {
    const [fileModalVisible, setFileModalVisible] = useState(false);
     const [trash, setTrash] = useState([]);
     const[toglehide,setToggleHide] = useState(true);
+  const [AcessPin,setAcessPin]= useState(false);
+  const [SavedPin,setSavedPin]= useState(false);
+
     
 
     const [Pin,setPin]= useState(false);
@@ -58,6 +61,7 @@ export default function App() {
   const [myPasswords, setmyPasswords] = useState(false);
   const [setttingsView,setsettingsView]= useState(false);
   const [trashView,settrashView]= useState(false);
+
 
   //Settings
 
@@ -455,7 +459,9 @@ const renderFile = ({ item }) => (
       Talktodevteam:'Contact developer team',
       Help:"Help",
       FAQ:'FAQ',
-      Erase:'Clear App Data'
+      Erase:'Clear App Data',
+      AcessPin:' App acess Pin',
+      SavedPin:'Saved Passwords',
     },
      fr: {
     greeting: 'Bonjour',
@@ -482,7 +488,9 @@ const renderFile = ({ item }) => (
     Talktodevteam: 'Contacter l’équipe de développeurs',
     Help:"Aidé",
     FAQ:'FAQ',
-    Erase:'Nettoyer ,'
+    Erase:'Nettoyer ',
+    AcessPin:' App acess Pin',
+    SavedPin:'Saved Passwords',
   },
     pt: {
       greeting: 'Olá',
@@ -509,7 +517,9 @@ const renderFile = ({ item }) => (
       Talktodevteam:'Contactar a equipe de densevolvedores',
       Help:"ajuda",
       FAQ:'FAQ',
-      Erase:'Limpar os dados da aplicação'
+      Erase:'Limpar os dados da aplicação',
+      AcessPin:' senha de acesso',
+      SavedPin:'Senhas guardadas',
     },
   };
 
@@ -1182,12 +1192,12 @@ const renderFile = ({ item }) => (
 
 {myPasswords&&(
   <Modal onRequestClose={()=>setmyPasswords(false)}>
-    <View style={[styles.container, isDark ? styles.dark : styles.light]}>
+    <View style={[styles.PasswordsViewcontainer, isDark ? styles.dark : styles.light]}>
       <View style={{
         width:'100%',
         height:30,
         flexDirection:'row',
-        marginTop:20
+        marginTop:30
       }}>
         <Text
         style={{
@@ -1200,7 +1210,7 @@ const renderFile = ({ item }) => (
         <TouchableOpacity style={{ marginTop: 5, marginLeft: 150 }} >
                     <Image
                       source={require('./assets/wallet.png')}
-                      style={{ width: 25, height: 25 }}
+                      style={{ width: 25, height: 25,tintColor:'white' }}
                     />
         </TouchableOpacity>
         
@@ -1212,21 +1222,21 @@ const renderFile = ({ item }) => (
         
       }}>
 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={()=>setAcessPin(true)}>
           <View style={{
             width:'90%',
-            height:150,
+            height:100,
             backgroundColor:'lightgray',
             alignSelf:'center',
             borderRadius:20,
-            marginTop:50
+            marginTop:150
           }}>
             <Text style={{
               marginLeft:20,
               marginTop:10,
               fontSize:15,
               fontWeight:'bold'
-            }}>App Acess Pin</Text>
+            }}>{t('AcessPin')}</Text>
 
             <TextInput
              placeholder='* * * *'
@@ -1239,7 +1249,7 @@ const renderFile = ({ item }) => (
              borderRadius:10,
              alignSelf:'center',
              fontSize:50,
-             marginTop:20,
+             marginTop:0,
              
              
              color:'red',fontWeight:'bold'}}/>
@@ -1250,6 +1260,37 @@ const renderFile = ({ item }) => (
              }}>
               <Image
               source={require('./assets/view.png')}
+              style={{width:30,height:30}}
+              />
+             </TouchableOpacity>
+
+          </View>
+        </TouchableOpacity>
+
+       <TouchableOpacity onPress={()=>setSavedPin(true)}>
+          <View style={{
+            width:'90%',
+            height:100,
+            backgroundColor:'lightgray',
+            alignSelf:'center',
+            borderRadius:20,
+            marginTop:20
+          }}>
+            <Text style={{
+              marginLeft:20,
+              marginTop:25,
+              fontSize:30,
+              fontWeight:'bold'
+            }}>{t('SavedPin')}</Text>
+
+           
+             <TouchableOpacity
+             style={{
+              marginLeft:280,
+              marginTop:-35
+             }}>
+              <Image
+              source={require('./assets/save-instagram.png')}
               style={{width:30,height:30}}
               />
              </TouchableOpacity>
@@ -2164,6 +2205,75 @@ const renderFile = ({ item }) => (
 
 
     </View>
+  </Modal>
+)}
+
+{AcessPin&&(
+  <Modal
+  transparent
+  onRequestClose={()=>setAcessPin(false)}>
+<View style={{
+  backgroundColor:'gray',
+  height:240,
+  width:'90%',
+  alignSelf:'center',
+  marginTop:200,
+  borderRadius:10
+}}>
+
+  <Text style={{
+    textAlign:'center',
+    marginTop:30,
+    fontSize:20,
+    fontWeight:'bold'
+  }}>Current Password:</Text>
+
+  <Text
+  style={{
+    textAlign:'center',
+    marginTop:30,
+    fontSize:25,
+    color:'black',
+    fontWeight:'bold'
+  }}> {storedPin}</Text>
+  <TouchableOpacity style={{
+    marginLeft:280,
+    marginTop:-30
+  }}>
+    <Image
+    source={require('./assets/hide.png')}
+    style={{width:30,height:30}}
+    />
+  </TouchableOpacity>
+
+  <TouchableOpacity style={{
+    width:300,
+    height:50,
+    backgroundColor:'white',
+    borderRadius:10,
+    alignSelf:'center',
+    marginTop:30
+  }}>
+    <Text
+    style={{
+      textAlign:'center',
+      fontSize:20,
+      marginTop:10,
+      fontWeight:'bold'
+    }}>change Password?</Text>
+  </TouchableOpacity>
+
+ 
+
+</View>
+  </Modal>
+)}
+
+{SavedPin&&(
+  <Modal
+  transparent
+  onRequestClose={()=>setSavedPin(false)}>
+
   </Modal>
 )}
     </View>
