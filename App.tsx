@@ -37,6 +37,8 @@ export default function App() {
     const[toglehide,setToggleHide] = useState(true);
   const [AcessPin,setAcessPin]= useState(false);
   const [SavedPin,setSavedPin]= useState(false);
+  const [see,setsee] = useState(true);
+  const [hide,setHide]= useState(false);
 
     
 
@@ -2208,74 +2210,97 @@ const renderFile = ({ item }) => (
   </Modal>
 )}
 
-{AcessPin&&(
+{AcessPin && (
   <Modal
-  transparent
-  onRequestClose={()=>setAcessPin(false)}>
-<View style={{
-  backgroundColor:'gray',
-  height:240,
-  width:'90%',
-  alignSelf:'center',
-  marginTop:200,
-  borderRadius:10
-}}>
+    transparent
+    animationType="fade"
+    onRequestClose={() => setAcessPin(false)}
+  >
+    <View style={{
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      marginTop: -145
+    }}>
+      <View style={{
+        backgroundColor: 'gray',
+        height: 240,
+        width: '90%',
+        borderRadius: 10,
+        padding: 10,
+        alignItems: 'center',
+      }}>
+        <Text style={{
+          textAlign: 'center',
+          marginTop: 30,
+          fontSize: 20,
+          fontWeight: 'bold'
+        }}>
+          Current Password:
+        </Text>
 
-  <Text style={{
-    textAlign:'center',
-    marginTop:30,
-    fontSize:20,
-    fontWeight:'bold'
-  }}>Current Password:</Text>
+        {/* Password box inside the modal */}
+        <View style={{
+          width: 200,
+          height: 70,
+          borderRadius: 10,
+          marginTop: 50,
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          backgroundColor: '#fff'
+        }}>
+          <Text style={{
+            fontSize: 30,
+            fontWeight: 'bold',
+            color: 'black'
+          }}>
+            {hide ? '****' : storedPin}
+          </Text>
 
-  <Text
-  style={{
-    textAlign:'center',
-    marginTop:30,
-    fontSize:25,
-    color:'black',
-    fontWeight:'bold'
-  }}> {storedPin}</Text>
-  <TouchableOpacity style={{
-    marginLeft:280,
-    marginTop:-30
-  }}>
-    <Image
-    source={require('./assets/hide.png')}
-    style={{width:30,height:30}}
-    />
-  </TouchableOpacity>
-
-  <TouchableOpacity style={{
-    width:300,
-    height:50,
-    backgroundColor:'white',
-    borderRadius:10,
-    alignSelf:'center',
-    marginTop:30
-  }}>
-    <Text
-    style={{
-      textAlign:'center',
-      fontSize:20,
-      marginTop:10,
-      fontWeight:'bold'
-    }}>change Password?</Text>
-  </TouchableOpacity>
-
- 
-
-</View>
+          <TouchableOpacity
+            style={{
+              position: 'absolute',
+              top: 20,
+              right: 10
+            }}
+            onPress={() => setHide(!hide)} // toggle hide state
+          >
+            <Image
+              source={
+                hide
+                  ? require('./assets/view.png') // eye icon
+                  : require('./assets/hide.png') // crossed eye icon
+              }
+              style={{ width: 30, height: 30 }}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
   </Modal>
 )}
+
+
 
 {SavedPin&&(
   <Modal
   transparent
   onRequestClose={()=>setSavedPin(false)}>
+<View style={{
+  
+}}>
 
+</View>
   </Modal>
 )}
+
+
+
+
+
+
     </View>
   );
 }
