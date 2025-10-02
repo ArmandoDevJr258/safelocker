@@ -39,6 +39,9 @@ export default function App() {
   const [SavedPin,setSavedPin]= useState(false);
   const [see,setsee] = useState(true);
   const [hide,setHide]= useState(false);
+  const [appversion,setappVersion] = useState(false);
+  const [devinfo,setDevInfo] = useState(false);
+  const [privacypolicy,setPrivacyPolicy] =useState(false);
 
     
 
@@ -676,7 +679,7 @@ const renderFile = ({ item }) => (
 
       <View style={{
         width:'100%',
-        height:300,
+        height:320,
         backgroundColor:'#9fa49fff',
         borderTopLeftRadius:40,
         borderTopRightRadius:40,
@@ -1666,7 +1669,7 @@ const renderFile = ({ item }) => (
         
       }}>About App</Text>
 
-<TouchableOpacity onPress={()=>setTheme(true)}>
+<TouchableOpacity onPress={()=>setappVersion(true)}>
       <Text
       style={{
         
@@ -1682,7 +1685,7 @@ const renderFile = ({ item }) => (
       />
 </TouchableOpacity>
 
-<TouchableOpacity onPress={()=>setTheme(true)}>
+<TouchableOpacity onPress={()=>setDevInfo(true)}>
      <Text
       style={{
         
@@ -1698,7 +1701,7 @@ const renderFile = ({ item }) => (
       />
 
 </TouchableOpacity>
-<TouchableOpacity onPress={()=>setTheme(true)}>
+<TouchableOpacity onPress={()=>setPrivacyPolicy(true)}>
   <Text
       style={{
         
@@ -2289,15 +2292,161 @@ const renderFile = ({ item }) => (
   transparent
   onRequestClose={()=>setSavedPin(false)}>
 <View style={{
+  flex:1,
+  width:'100%',
+  backgroundColor:'white'
   
+
 }}>
+  <Text 
+  style={{
+    fontSize:20,
+    marginLeft:20,
+    marginTop:20,
+    fontWeight:'bold'
+  }}>Saved Passords</Text>
+  
 
 </View>
   </Modal>
 )}
 
+{appversion&&(
+  <Modal
+  transparent
+  onRequestClose={()=>setTheme(false)}>
+    <View style={{
+      width:350,
+      height:170,
+      backgroundColor:'#dee7c1ff',
+      alignSelf:'center',
+      marginTop:200,
+      borderRadius:10
+    }}>
+
+<TouchableOpacity onPress={()=>setappVersion(false)}>
+  <Image 
+  source={require('./assets/back.png')}
+  style={{
+    width:17,
+    height:17,
+    marginTop:20,
+    marginLeft:15
+
+  }}
+  />
+</TouchableOpacity>
+      
+     
+  <Text style={{
+    textAlign:'center',
+    marginTop:20,
+    fontSize:20,
+    fontWeight:'bold'
+  }}>App version</Text>
+  <Text style={{
+    textAlign:'center',
+    marginTop:20,
+    fontSize:20,
+    fontWeight:'bold'
+  }}>1.0</Text>
 
 
+
+
+    </View>
+
+  </Modal>
+)}
+
+{devinfo&&(
+  <Modal onRequestClose={()=>setDevInfo(false)}>
+    <View style={{
+      flex:1,
+      backgroundColor:'#dee7c1ff',
+    }}>
+
+      <TouchableOpacity onPress={()=>setDevInfo(false)}>
+  <Image 
+  source={require('./assets/back.png')}
+  style={{
+    width:20,
+    height:20,
+    marginTop:20,
+    marginLeft:20
+
+  }}
+  />
+</TouchableOpacity>
+      <Text style={{
+        marginTop:-25,
+        textAlign:'center',
+        fontWeight:'bold',
+        fontSize:20
+      }}>Developer Info</Text>
+       <Text style={{
+        marginTop:20,
+        textAlign:'center',
+        fontWeight:'bold',
+        fontSize:17
+      }}>who am I?</Text>
+        <Text>Name:Armando Júnior</Text>
+         <Text> i am a passionate Mobile developer with proven
+           experience in building productivity based mobile apps</Text>
+
+            <Text style={{
+        marginTop:20,
+        textAlign:'center',
+        fontWeight:'bold',
+        fontSize:17
+      }}>How to find me?</Text>
+    </View>
+  </Modal>
+)}
+{privacypolicy&&(
+  <Modal onRequestClose={()=>setPrivacyPolicy(false)}>
+    <View style={{
+      flex:1,
+      backgroundColor:'#dee7c1ff',
+    }}>
+
+      <TouchableOpacity onPress={()=>setDevInfo(false)}>
+  <Image 
+  source={require('./assets/back.png')}
+  style={{
+    width:20,
+    height:20,
+    marginTop:20,
+    marginLeft:20
+
+  }}
+  />
+</TouchableOpacity>
+      <Text style={{
+        marginTop:-25,
+        textAlign:'center',
+        fontWeight:'bold',
+        fontSize:20
+      }}>Privacy & policy</Text>
+       <Text style={{
+        marginTop:20,
+        textAlign:'center',
+        fontWeight:'bold',
+        fontSize:17
+      }}>who am I?</Text>
+        <Text>Name:Armando Júnior</Text>
+         <Text> i am a passionate Mobile developer with proven
+           experience in building productivity based mobile apps</Text>
+
+            <Text style={{
+        marginTop:20,
+        textAlign:'center',
+        fontWeight:'bold',
+        fontSize:17
+      }}>How to find me?</Text>
+    </View>
+  </Modal>
+)}
 
 
 
@@ -2314,7 +2463,7 @@ const styles = StyleSheet.create({
     btnmode: { marginLeft: 20, marginTop: 12 },
     btnflag: { marginLeft: 10, marginTop: 12 },
     btnsettings: { marginLeft: 10, marginTop: 12,tintColor:'white' },
-    maincontainer: { width: '100%', height: 450, marginTop: 40, borderRadius: 20 ,marginLeft:20},
+    maincontainer: { width: '100%', height: 450, marginTop: 100, borderRadius: 20 ,marginLeft:20},
     topview: { flexDirection: 'row', width: '100%' },
     bottomview: { flexDirection: 'row' },
     view: { width: 150, height: 150, backgroundColor: '#6A4A99', margin: 10, marginTop: 50, borderRadius: 20 },
