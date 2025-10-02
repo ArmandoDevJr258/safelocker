@@ -28,6 +28,7 @@ export default function App() {
   const [header, setheader] = useState(true);
   const [newFolderName, setNewFolderName] = useState('');
   const [renameModalVisible, setRenameModalVisible] = useState(false);
+  const [lockfolder,setlockfolder] = useState(false);
   const [flatListKey, setFlatListKey] = useState(0);
   const [isGridView, setIsGridView] = useState(false);
   const [isGrid, setIsGrid] = useState(false); 
@@ -42,6 +43,10 @@ export default function App() {
   const [appversion,setappVersion] = useState(false);
   const [devinfo,setDevInfo] = useState(false);
   const [privacypolicy,setPrivacyPolicy] =useState(false);
+   const [lockPinModalVisible, setLockPinModalVisible] = useState(false); // New state for setting the PIN
+  const [unlockPinModalVisible, setUnlockPinModalVisible] = useState(false); // New state for opening the folder
+  const [currentFolderPin, setCurrentFolderPin] = useState(''); // Pin being set or entered for the specific folder
+  const [isSettingNewPin, setIsSettingNewPin] = useState(false); // To differentiate between setting and entering PIN
 
     
 
@@ -109,7 +114,47 @@ export default function App() {
 
 
  
- 
+ // ... after handleDeleteFile2 function
+
+// 🔒 Logic for Locking Folder 🔒
+const handleSetFolderPin = async () => {
+  if (!selectedFolder || currentFolderPin.length < 4) {
+    Alert.alert('Invalid PIN', 'Please enter a 4-digit PIN.');
+    return;
+  }
+
+  const updatedFolders = folders.map(f =>
+    f.id === selectedFolder.id ? { ...f, pin: currentFolderPin } : f
+  );
+
+  setFolders(updatedFolders);
+  // Update selectedFolder state as well
+  setSelectedFolder(prev => ({ ...prev, pin: currentFolderPin }));
+
+  await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
+
+  setLockPinModalVisible(false);
+  setCurrentFolderPin('');
+  setIsSettingNewPin(false);
+  Alert.alert('Success', `Folder "${selectedFolder.name}" locked.`);
+};
+
+// 🔓 Logic for Unlocking/Opening Folder 🔓
+const handleUnlockFolder = () => {
+  if (!selectedFolder) return;
+
+  if (currentFolderPin === selectedFolder.pin) {
+    setUnlockPinModalVisible(false);
+    setCurrentFolderPin('');
+    // Proceed to open the folder modal (existing logic)
+    setFolderModalVisible(true);
+  } else {
+    Alert.alert('Incorrect PIN', 'Please try again.');
+    setCurrentFolderPin('');
+  }
+};
+
+// ... before pickFile function
  
  
  
@@ -467,6 +512,12 @@ const renderFile = ({ item }) => (
       Erase:'Clear App Data',
       AcessPin:' App acess Pin',
       SavedPin:'Saved Passwords',
+      Lock :'lock',
+    
+        setFolderPin:'Set a PIN to lock this folder', 
+      unlockFolder:'Enter PIN to unlock folder',
+      SetPIN:'Set PIN',
+      Submit:'Submit',
     },
      fr: {
     greeting: 'Bonjour',
@@ -496,6 +547,12 @@ const renderFile = ({ item }) => (
     Erase:'Nettoyer ',
     AcessPin:' App acess Pin',
     SavedPin:'Saved Passwords',
+    Lock :'lock',
+    setPin:'set a pin to lock this folder',
+     setFolderPin:'Définissez un code PIN pour verrouiller ce dossier',
+      unlockFolder:"Entrez le code PIN pour déverrouiller le dossier",
+      SetPIN:'Définir le code PIN',
+      Submit:'Soumettre',
   },
     pt: {
       greeting: 'Olá',
@@ -525,6 +582,15 @@ const renderFile = ({ item }) => (
       Erase:'Limpar os dados da aplicação',
       AcessPin:' senha de acesso',
       SavedPin:'Senhas guardadas',
+      Lock :'blockeiar',
+      setPin:'coloque um pin para ,etc',  setFolderPin:'Set a PIN to lock this folder', 
+      unlockFolder:'Enter PIN to unlock folder',
+      SetPIN:'Set PIN',
+      Submit:'Submit',
+       setFolderPin:'Defina um PIN para bloquear esta pasta',
+      unlockFolder:"Digite o PIN para desbloquear a pasta",
+      SetPIN:'Definir PIN',
+      Submit:'Enviar',
     },
   };
 
@@ -580,6 +646,74 @@ const renderFile = ({ item }) => (
         </View>
       </Modal>
 
+      {/* lock Modal */}
+
+// ❌ DELETE the old 'lock Modal' entirely:
+// {/* lock Modal */}
+// <Modal visible={lockfolder} animationType="slide"
+  onRequestClose={()=>setlockfolder(false)}>
+
+ </Modal>
+
+
+      {/* 🔒 Lock Folder PIN Setting Modal */}
+      <Modal visible={lockPinModalVisible} animationType="slide" onRequestClose={() => setLockPinModalVisible(false)}>
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitleText}>{t('setFolderPin')}</Text>
+            <TextInput
+              style={styles.input}
+              value={currentFolderPin}
+              onChangeText={setCurrentFolderPin}
+              keyboardType="number-pad"
+              secureTextEntry
+              maxLength={4}
+              placeholder="****"
+              placeholderTextColor={'blue'}
+            />
+            <TouchableOpacity style={styles.button} onPress={handleSetFolderPin}>
+              <Text style={styles.buttonText}>{t('SetPIN')}</Text>
+            </TouchableOpacity>
+             <TouchableOpacity 
+              style={[styles.button, { marginTop: 10, backgroundColor: '#dc3545' }]} // Red color for cancel
+              onPress={() => setLockPinModalVisible(false)}
+            >
+              <Text style={styles.buttonText}>{t('Cancel')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+    
+      <Modal visible={unlockPinModalVisible} animationType="slide" onRequestClose={() => setUnlockPinModalVisible(false)}>
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitleText}>{t('unlockFolder')}</Text>
+            <TextInput
+              style={styles.input}
+              value={currentFolderPin}
+              onChangeText={setCurrentFolderPin}
+              keyboardType="number-pad"
+              secureTextEntry
+              maxLength={4}
+              placeholder="****"
+              placeholderTextColor={'blue'}
+            />
+            <TouchableOpacity style={styles.button} onPress={handleUnlockFolder}>
+              <Text style={styles.buttonText}>{t('Submit')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.button, { marginTop: 10, backgroundColor: '#dc3545' }]} // Red color for cancel
+              onPress={() => setUnlockPinModalVisible(false)}
+            >
+              <Text style={styles.buttonText}>{t('Cancel')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Header */}
+// ...
       {/* Header */}
       <View style={styles.header}>
         <View style={{
@@ -757,6 +891,20 @@ const renderFile = ({ item }) => (
                 >
                   {selectedFolder?.name}
                 </Text>
+
+                  {selectedFolder?.id !== 'default_folder' && (
+                  <TouchableOpacity
+                    style={styles.renameButton}
+                    onPress={() => {
+                      // 👇 UPDATED LOGIC HERE
+                      setIsSettingNewPin(true);
+                      setCurrentFolderPin(selectedFolder.pin || ''); 
+                      setLockPinModalVisible(true);
+                    }}
+                  >
+                    <Text style={{ fontSize: 20 }}>{t('Lock')}</Text>
+                  </TouchableOpacity>
+                )}
                 {selectedFolder?.id !== 'default_folder' && (
                   <TouchableOpacity
                     style={styles.renameButton}
@@ -780,6 +928,7 @@ const renderFile = ({ item }) => (
               </View>
             )}
 
+
             <View>
               <FlatList
                 key={flatListKey}
@@ -791,7 +940,12 @@ const renderFile = ({ item }) => (
                   <TouchableOpacity
                     onPress={() => {
                       setSelectedFolder(item);
-                      setFolderModalVisible(true);
+                      if (item.pin) { // Check if the folder has a pin
+                        setCurrentFolderPin('');
+                        setUnlockPinModalVisible(true); // Show unlock modal
+                      } else {
+                        setFolderModalVisible(true); // Open folder normally
+                      }
                     }}
                     onLongPress={() => {
                       if (item.id === 'default_folder') {
@@ -806,11 +960,18 @@ const renderFile = ({ item }) => (
                   >
                     <View>
                       <Text style={{ textAlign: 'center' ,color:'#FFD580'}}>{item.name}</Text>
+                      {item.pin && ( // 🔑 Visual cue for a locked folder
+                         <Image
+                          source={require('./assets/lock.png')}
+                          style={{ width: 15, height: 15, position: 'absolute', right: 5, top: 5, tintColor: '#FFD580' }}
+                        />
+                      )}
                     </View>
                   </TouchableOpacity>
                 )}
               />
             </View>
+
           </View>
         </Modal>
       )}
