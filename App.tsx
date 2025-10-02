@@ -45,8 +45,10 @@ export default function App() {
   const [privacypolicy,setPrivacyPolicy] =useState(false);
    const [lockPinModalVisible, setLockPinModalVisible] = useState(false); // New state for setting the PIN
   const [unlockPinModalVisible, setUnlockPinModalVisible] = useState(false); // New state for opening the folder
-  const [currentFolderPin, setCurrentFolderPin] = useState(''); // Pin being set or entered for the specific folder
-  const [isSettingNewPin, setIsSettingNewPin] = useState(false); // To differentiate between setting and entering PIN
+  const [currentFolderPin, setCurrentFolderPin] = useState(''); 
+  const [isSettingNewPin, setIsSettingNewPin] = useState(false); 
+   const [folderPinsList, setFolderPinsList] = useState([]); 
+     const [savedFolderPinsModal, setSavedFolderPinsModal] = useState(false); 
 
     
 
@@ -73,6 +75,7 @@ export default function App() {
   const [trashView,settrashView]= useState(false);
 
 
+  
   //Settings
 
   const [apearence,setApearence] = useState(false);
@@ -116,27 +119,52 @@ export default function App() {
  
  // ... after handleDeleteFile2 function
 
-// 🔒 Logic for Locking Folder 🔒
+
+const [pins, setPins] = useState([]); // store all pins in an array
 const handleSetFolderPin = async () => {
   if (!selectedFolder || currentFolderPin.length < 4) {
     Alert.alert('Invalid PIN', 'Please enter a 4-digit PIN.');
     return;
   }
 
+  // --- NEW LOGIC FOR SAVING PIN ENTRY ---
+  const newPinEntry = {
+    folderId: selectedFolder.id,
+    folderName: selectedFolder.name,
+    pin: currentFolderPin,
+    date: new Date().toISOString(),
+  };
+
+  // 1. Update the folder list (for locking the folder itself)
   const updatedFolders = folders.map(f =>
     f.id === selectedFolder.id ? { ...f, pin: currentFolderPin } : f
   );
-
   setFolders(updatedFolders);
-  // Update selectedFolder state as well
   setSelectedFolder(prev => ({ ...prev, pin: currentFolderPin }));
-
   await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
 
+  // 2. Update the folder PINs list (for display in Saved Passwords screen)
+  const existingIndex = folderPinsList.findIndex(item => item.folderId === selectedFolder.id);
+  let updatedPinsList;
+
+  if (existingIndex > -1) {
+    // Pin already exists, update it
+    updatedPinsList = folderPinsList.map((item, index) =>
+      index === existingIndex ? newPinEntry : item
+    );
+  } else {
+    // New pin, add it
+    updatedPinsList = [...folderPinsList, newPinEntry];
+  }
+
+  setFolderPinsList(updatedPinsList);
+  await AsyncStorage.setItem('folderPinsList', JSON.stringify(updatedPinsList));
+  // ----------------------------------------
+  setPins((prevPins) => [...prevPins, currentFolderPin]);
   setLockPinModalVisible(false);
   setCurrentFolderPin('');
   setIsSettingNewPin(false);
-  Alert.alert('Success', `Folder "${selectedFolder.name}" locked.`);
+  Alert.alert('Success', `Folder "${selectedFolder.name}" locked and PIN saved.`);
 };
 
 // 🔓 Logic for Unlocking/Opening Folder 🔓
@@ -253,7 +281,7 @@ const showAlert = (file) => {
     setFolders(prev => prev.filter(folder => folder.id !== id));
   };
 
-  const handleDelete = async () => {
+const handleDelete = async () => {
   if (!selectedFolder) return;
   if (selectedFolder.id === 'default_folder') {
     Alert.alert('Cannot Delete', 'This is a permanent folder.');
@@ -266,15 +294,53 @@ const showAlert = (file) => {
   setTrash(newTrash);
   await AsyncStorage.setItem('trash', JSON.stringify(newTrash));
 
-  // then remove it from folders
+  // remove folder from folders
   const updatedFolders = folders.filter(f => f.id !== selectedFolder.id);
   setFolders(updatedFolders);
   await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
 
+  // ✅ NEW: remove folder pin from folderPinsList
+  const updatedPinsList = folderPinsList.filter(pin => pin.folderId !== selectedFolder.id);
+  setFolderPinsList(updatedPinsList);
+  await AsyncStorage.setItem('folderPinsList', JSON.stringify(updatedPinsList));
+
+  // also update pins array if you’re showing plain pin numbers
+  const updatedPins = pins.filter(p => p.folderId !== selectedFolder.id);
+  setPins(updatedPins);
+
+  // reset modal states
   setSelectedFolder(null);
   setfolderedit(false);
   setheader(true);
 };
+
+useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const savedPin = await AsyncStorage.getItem('userPin');
+        if (savedPin) setStoredPin(savedPin);
+        else setSettingPin(true);
+
+        const savedLang = await AsyncStorage.getItem('language');
+        if (savedLang) setLanguage(savedLang);
+
+        const savedTheme = await AsyncStorage.getItem('theme');
+        if (savedTheme) setIsDark(savedTheme === 'dark');
+
+        const savedFolders = await AsyncStorage.getItem('folders');
+        if (savedFolders) setFolders(JSON.parse(savedFolders));
+
+        // 👇 NEW: Load the saved folder pins list
+        const savedFolderPins = await AsyncStorage.getItem('folderPinsList');
+        if (savedFolderPins) setFolderPinsList(JSON.parse(savedFolderPins));
+        // 👆 NEW: Load the saved folder pins list
+
+      } catch (err) {
+        console.log('Error loading settings:', err);
+      }
+    };
+    loadSettings();
+  }, []);
 
 useEffect(() => {
   const loadTrash = async () => {
@@ -2466,7 +2532,16 @@ const renderFile = ({ item }) => (
     marginTop:20,
     fontWeight:'bold'
   }}>Saved Passords</Text>
-  
+<FlatList
+  data={pins}
+  keyExtractor={(item, index) => index.toString()}
+  renderItem={({ item }) => (
+    <View style={{ padding: 10, margin: 5, backgroundColor: "#eee", borderRadius: 8 }}>
+      <Text style={{ fontSize: 18, color: "blue" }}>PIN: {item}</Text>
+    </View>
+  )}
+/>
+
 
 </View>
   </Modal>
@@ -2841,5 +2916,32 @@ modalboxview:{
   marginTop:200,
   borderRadius:15
 }
+,
+  folderPinItem: {
+    padding: 15,
+    marginVertical: 5,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 10,
+    borderLeftWidth: 5,
+    borderLeftColor: '#007bff',
+    width: '100%',
+  },
+  folderPinText: {
+    fontSize: 16,
+    color: '#343a40',
+  },
+  settingsItem: { // Used for the button in My Passwords screen
+    padding: 15,
+    marginHorizontal: 20,
+    marginVertical: 5,
+    backgroundColor: '#5CB85C',
+    borderRadius: 10,
+  },
+  settingsItemText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+// ...
     
 });
