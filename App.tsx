@@ -49,8 +49,10 @@ export default function App() {
   const [isSettingNewPin, setIsSettingNewPin] = useState(false); 
    const [folderPinsList, setFolderPinsList] = useState([]); 
      const [savedFolderPinsModal, setSavedFolderPinsModal] = useState(false); 
+     const [activityLog, setActivityLog] = useState([]);
 
     
+
 
     const [Pin,setPin]= useState(false);
 // selected items ids in trash
@@ -117,7 +119,6 @@ export default function App() {
 
 
  
- // ... after handleDeleteFile2 function
 
 
 const [pins, setPins] = useState([]); // store all pins in an array
@@ -900,7 +901,7 @@ const renderFile = ({ item }) => (
           marginTop:15
         }}>{t('viewAll')}</Text>
         </View>
-       
+        
       </View>
 
       {/* Language Modal */}
@@ -2514,38 +2515,53 @@ const renderFile = ({ item }) => (
 
 
 
-{SavedPin&&(
+{SavedPin && (
   <Modal
-  transparent
-  onRequestClose={()=>setSavedPin(false)}>
-<View style={{
-  flex:1,
-  width:'100%',
-  backgroundColor:'white'
-  
+    transparent
+    onRequestClose={() => setSavedPin(false)}
+  >
+    <View style={{
+      flex: 1,
+      width: '100%',
+      backgroundColor: 'white'
+    }}>
+      <Text
+        style={{
+          fontSize: 20,
+          marginLeft: 20,
+          marginTop: 20,
+          fontWeight: 'bold'
+        }}
+      >
+        {t('SavedPin')}
+      </Text>
 
-}}>
-  <Text 
-  style={{
-    fontSize:20,
-    marginLeft:20,
-    marginTop:20,
-    fontWeight:'bold'
-  }}>Saved Passords</Text>
-<FlatList
-  data={pins}
-  keyExtractor={(item, index) => index.toString()}
-  renderItem={({ item }) => (
-    <View style={{ padding: 10, margin: 5, backgroundColor: "#eee", borderRadius: 8 }}>
-      <Text style={{ fontSize: 18, color: "blue" }}>PIN: {item}</Text>
+      <FlatList
+        data={folderPinsList}   // ✅ use the real saved list
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <View style={{
+            padding: 10,
+            margin: 5,
+            backgroundColor: "#eee",
+            borderRadius: 8
+          }}>
+            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+              📂 {item.folderName}
+            </Text>
+            <Text style={{ fontSize: 16, color: "blue" }}>
+              🔑 PIN: {item.pin}
+            </Text>
+            <Text style={{ fontSize: 12, color: "gray" }}>
+              {new Date(item.date).toLocaleString()}
+            </Text>
+          </View>
+        )}
+      />
     </View>
-  )}
-/>
-
-
-</View>
   </Modal>
 )}
+
 
 {appversion&&(
   <Modal
