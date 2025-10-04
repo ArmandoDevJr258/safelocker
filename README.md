@@ -10,8 +10,8 @@ Your go-to app for storing and securing your files.
 
 </div>
 <div align="center" style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-  <img  height="500" alt="1759605303507_100" src="https://github.com/user-attachments/assets/be0b9dac-41be-46c3-ba6d-3926c53538ca" />
-  <img  height="500" alt="1759605319063_100" src="https://github.com/user-attachments/assets/622d2eb5-9f33-411a-9a7c-1255a1029450" />
+  <img  height="300" alt="1759605303507_100" src="https://github.com/user-attachments/assets/be0b9dac-41be-46c3-ba6d-3926c53538ca" />
+  <img  height="300" alt="1759605319063_100" src="https://github.com/user-attachments/assets/622d2eb5-9f33-411a-9a7c-1255a1029450" />
   <img src="https://github-readme-stats.vercel.app/api?username=ArmandoDevJr258&show_icons=true&theme=radical" alt="GitHub Stats" style="height:150px;" />
  " style="height:150px;" />
 
