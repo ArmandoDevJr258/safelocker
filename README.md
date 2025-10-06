@@ -20,6 +20,7 @@ Safelocker lets you store your files and folders securely on your device.
 - 📝 **Activity Log** – Check recent activity performed within the app.  
 - 🔐 **Password Manager** – Manage passwords and PINs used within the app itself.  
 - 🎨 **Appearance Modes** – Toggle between Day and Night mode.  
+- set passwords to folders
 - 🌐 **Multi-language Support** – Currently supports English, French, and Portuguese.  
 - ⚙️ **Flexible Settings** – Change app settings anytime from the Settings screen.
 
